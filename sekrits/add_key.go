@@ -28,7 +28,10 @@ func AddKey(keyringPath string, alias string, providerDsn string) (string, error
 	}
 
 	key := keyring.NewKey(alias, rawKey)
-	kr.AddKey(key)
+	err = kr.AddKey(key)
+	if err != nil {
+		return "", err
+	}
 
 	return key.Id.String(), nil
 }
