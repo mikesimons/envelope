@@ -12,7 +12,7 @@ func addKeyCommand() cli.Command {
 	return cli.Command{
 		Name:      "add-key",
 		Usage:     "Add a key to the keyring",
-		ArgsUsage: "<name> <encryption dsn>",
+		ArgsUsage: "<alias> <master key dsn>",
 		Action: func(c *cli.Context) error {
 			if c.NArg() != 2 {
 				cli.ShowCommandHelp(c, "add-key")

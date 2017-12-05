@@ -57,10 +57,10 @@ func (kr *YAMLKeyring) GetKeys() []*Key {
 // AddKey adds a predefined key to the keyring
 func (kr *YAMLKeyring) AddKey(key *Key) error {
 	_, idExists := kr.GetKey(key.Id.String())
-	_, nameExists := kr.GetKey(key.Name)
+	_, aliasExists := kr.GetKey(key.Alias)
 
-	if idExists || nameExists {
-		return fmt.Errorf("Couldn't add key because '%s' clashes with an existing key alias or id", key.Name)
+	if idExists || aliasExists {
+		return fmt.Errorf("Couldn't add key because '%s' clashes with an existing key alias or id", key.Alias)
 	}
 
 	kr.Keys = append(kr.Keys, key)
@@ -79,10 +79,10 @@ func (kr *YAMLKeyring) AddKey(key *Key) error {
 }
 
 // GetKey gets an individual key from the keyring
-func (kr *YAMLKeyring) GetKey(nameOrId string) (*Key, bool) {
-	id := uuid.FromStringOrNil(nameOrId)
+func (kr *YAMLKeyring) GetKey(aliasOrId string) (*Key, bool) {
+	id := uuid.FromStringOrNil(aliasOrId)
 	for _, k := range kr.Keys {
-		if (id != uuid.UUID{} && k.Id == id) || k.Name == nameOrId {
+		if (id != uuid.UUID{} && k.Id == id) || k.Alias == aliasOrId {
 			return k, true
 		}
 	}

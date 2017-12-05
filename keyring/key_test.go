@@ -11,9 +11,9 @@ import (
 
 var _ = Describe("Key", func() {
 	Describe("NewKey", func() {
-		It("should return a new key with name, cipher text and id", func() {
-			key := keyring.NewKey("name", []byte("ciphertext"))
-			Expect(key.Name).To(Equal("name"))
+		It("should return a new key with alias, cipher text and id", func() {
+			key := keyring.NewKey("alias", []byte("ciphertext"))
+			Expect(key.Alias).To(Equal("alias"))
 			Expect(key.Ciphertext).To(Equal([]byte("ciphertext")))
 			Expect(key.Id).NotTo(BeAssignableToTypeOf(&uuid.UUID{}))
 		})
@@ -21,10 +21,10 @@ var _ = Describe("Key", func() {
 
 	Describe("Custom YAML", func() {
 		Describe("Marshal", func() {
-			It("should encode id, name & ciphertext", func() {
+			It("should encode id, alias & ciphertext", func() {
 				key := &keyring.Key{
 					Id:         uuid.NewV4(),
-					Name:       "name",
+					Alias:      "alias",
 					Ciphertext: []byte("test"),
 				}
 
@@ -37,7 +37,7 @@ var _ = Describe("Key", func() {
 
 				Expect(err).To(BeNil())
 				Expect(verify["id"]).To(Equal(key.Id.String()))
-				Expect(verify["name"]).To(Equal("name"))
+				Expect(verify["alias"]).To(Equal("alias"))
 				Expect(verify["key"]).To(Equal("dGVzdA==")) // Base64 encoded "test"
 			})
 		})

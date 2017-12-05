@@ -27,7 +27,7 @@ var _ = Describe("YAMLKeyring", func() {
 				keys := kr.GetKeys()
 
 				Expect(err).To(BeNil())
-				Expect(keys[0].Name).To(Equal("first"))
+				Expect(keys[0].Alias).To(Equal("first"))
 			})
 		})
 
@@ -57,13 +57,13 @@ var _ = Describe("YAMLKeyring", func() {
 				populateTestFile("testdata/test.yaml", "test.yaml", keyring.Fs)
 				kr, _ := keyring.LoadYAML("test.yaml")
 
-				kr.AddKey(&keyring.Key{Name: "second"})
+				kr.AddKey(&keyring.Key{Alias: "second"})
 
 				keys := kr.GetKeys()
 				contents, _ := afero.ReadFile(keyring.Fs, "test.yaml")
 
-				Expect(keys[1].Name).To(Equal("second"))
-				Expect(string(contents)).To(ContainSubstring("name: second"))
+				Expect(keys[1].Alias).To(Equal("second"))
+				Expect(string(contents)).To(ContainSubstring("alias: second"))
 			})
 		})
 
@@ -72,29 +72,29 @@ var _ = Describe("YAMLKeyring", func() {
 				keyring.Fs = afero.NewMemMapFs()
 				kr, _ := keyring.LoadYAML("test.yaml")
 
-				kr.AddKey(&keyring.Key{Name: "second"})
+				kr.AddKey(&keyring.Key{Alias: "second"})
 
 				keys := kr.GetKeys()
 				contents, _ := afero.ReadFile(keyring.Fs, "test.yaml")
 
-				Expect(keys[0].Name).To(Equal("second"))
-				Expect(string(contents)).To(ContainSubstring("name: second"))
+				Expect(keys[0].Alias).To(Equal("second"))
+				Expect(string(contents)).To(ContainSubstring("alias: second"))
 			})
 		})
 
-		It("should return error if key name / id clashes", func() {
+		It("should return error if key alias / id clashes", func() {
 			keyring.Fs = afero.NewMemMapFs()
 			populateTestFile("testdata/test.yaml", "test.yaml", keyring.Fs)
 			kr, _ := keyring.LoadYAML("test.yaml")
 
-			err := kr.AddKey(&keyring.Key{Name: "first"})
+			err := kr.AddKey(&keyring.Key{Alias: "first"})
 
 			Expect(err).ToNot(BeNil())
 		})
 	})
 
 	Describe("GetKey", func() {
-		It("should return the key given a name", func() {
+		It("should return the key given a alias", func() {
 			keyring.Fs = afero.NewMemMapFs()
 			populateTestFile("testdata/test.yaml", "test.yaml", keyring.Fs)
 			kr, _ := keyring.LoadYAML("test.yaml")
@@ -102,7 +102,7 @@ var _ = Describe("YAMLKeyring", func() {
 			key, ok := kr.GetKey("first")
 
 			Expect(ok).To(BeTrue())
-			Expect(key.Name).To(Equal("first"))
+			Expect(key.Alias).To(Equal("first"))
 		})
 
 		It("should return the key given an id", func() {
@@ -113,7 +113,7 @@ var _ = Describe("YAMLKeyring", func() {
 			key, ok := kr.GetKey("first")
 
 			Expect(ok).To(BeTrue())
-			Expect(key.Name).To(Equal("first"))
+			Expect(key.Alias).To(Equal("first"))
 		})
 
 		PIt("should return zero value key and false if key could not be found")

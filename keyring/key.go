@@ -7,15 +7,15 @@ import (
 
 type Key struct {
 	Id         uuid.UUID
-	Name       string
+	Alias      string
 	Ciphertext []byte
 }
 
-// NewKey builds a new key with the given name / encrypted data key
-func NewKey(name string, ciphertext []byte) *Key {
+// NewKey builds a new key with the given alias / encrypted data key
+func NewKey(alias string, ciphertext []byte) *Key {
 	return &Key{
 		Id:         uuid.NewV4(),
-		Name:       name,
+		Alias:      alias,
 		Ciphertext: ciphertext,
 	}
 }
@@ -23,16 +23,16 @@ func NewKey(name string, ciphertext []byte) *Key {
 func (key *Key) MarshalYAML() (interface{}, error) {
 	out := make(map[string]string)
 	out["id"] = key.Id.String()
-	out["name"] = key.Name
+	out["alias"] = key.Alias
 	out["key"] = base64.StdEncoding.EncodeToString(key.Ciphertext)
 	return out, nil
 }
 
 func (key *Key) UnmarshalYAML(unmarshal func(v interface{}) error) error {
 	var custom struct {
-		Id   uuid.UUID
-		Name string
-		Key  string
+		Id    uuid.UUID
+		Alias string
+		Key   string
 	}
 
 	if err := unmarshal(&custom); err != nil {
@@ -40,7 +40,7 @@ func (key *Key) UnmarshalYAML(unmarshal func(v interface{}) error) error {
 	}
 
 	key.Id = custom.Id
-	key.Name = custom.Name
+	key.Alias = custom.Alias
 	decoded, err := base64.StdEncoding.DecodeString(string(custom.Key))
 	if err != nil {
 		return err

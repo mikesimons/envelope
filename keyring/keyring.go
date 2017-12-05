@@ -8,7 +8,7 @@ var Fs = afero.NewOsFs()
 
 type Keyring interface {
 	GetKeys() []*Key
-	GetKey(name string) (*Key, bool)
+	GetKey(aliasOrId string) (*Key, bool)
 	AddKey(*Key) error
 }
 
