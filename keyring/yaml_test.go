@@ -81,6 +81,16 @@ var _ = Describe("YAMLKeyring", func() {
 				Expect(string(contents)).To(ContainSubstring("name: second"))
 			})
 		})
+
+		It("should return error if key name / id clashes", func() {
+			keyring.Fs = afero.NewMemMapFs()
+			populateTestFile("testdata/test.yaml", "test.yaml", keyring.Fs)
+			kr, _ := keyring.LoadYAML("test.yaml")
+
+			err := kr.AddKey(&keyring.Key{Name: "first"})
+
+			Expect(err).ToNot(BeNil())
+		})
 	})
 
 	Describe("GetKey", func() {
