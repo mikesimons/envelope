@@ -60,7 +60,7 @@ func (kr *YAMLKeyring) AddKey(key *Key) error {
 	_, nameExists := kr.GetKey(key.Name)
 
 	if idExists || nameExists {
-		return fmt.Errorf("Couldn't add key because the alias clashes with an existing key alias or id")
+		return fmt.Errorf("Couldn't add key because '%s' clashes with an existing key alias or id", key.Name)
 	}
 
 	kr.Keys = append(kr.Keys, key)
