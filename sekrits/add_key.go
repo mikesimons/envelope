@@ -1,6 +1,7 @@
 package sekrits
 
 import (
+	"fmt"
 	"github.com/mikesimons/sekrits/keyring"
 	"github.com/mikesimons/sekrits/keysvc"
 	"net/url"
@@ -22,7 +23,7 @@ func AddKey(keyringPath string, alias string, datakeyDsn string) (string, error)
 		return "", err
 	}
 
-	rawKey, err := dkp.GenerateDatakey(parsed.Host)
+	rawKey, err := dkp.GenerateDatakey(fmt.Sprintf("%s%s", parsed.Host, parsed.Path))
 	if err != nil {
 		return "", err
 	}
