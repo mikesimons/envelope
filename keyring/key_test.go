@@ -41,5 +41,7 @@ var _ = Describe("Key", func() {
 				Expect(verify["key"]).To(Equal("dGVzdA==")) // Base64 encoded "test"
 			})
 		})
+
+		PDescribe("Unmarshal", func() {})
 	})
 })

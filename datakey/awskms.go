@@ -1,4 +1,4 @@
-package awskms
+package datakey
 
 import (
 	"fmt"
@@ -12,29 +12,26 @@ import (
 
 var awsSession = session.Must(session.NewSession())
 
-type GenerateDatakey struct {
-}
-
-type DatakeyProvider struct {
+type AWSKMSProvider struct {
 	client kmsiface.KMSAPI
 }
 
-func New() (*DatakeyProvider, error) {
+func NewAWSKMS() (*AWSKMSProvider, error) {
 	kmsClient := kms.New(awsSession, aws.NewConfig())
-	return &DatakeyProvider{
+	return &AWSKMSProvider{
 		client: kmsClient,
 	}, nil
 }
 
-func (dkp *DatakeyProvider) DecryptDatakey(key []byte) {
+func (dkp *AWSKMSProvider) DecryptDatakey(key []byte) {
 
 }
 
-func (dkp *DatakeyProvider) GenerateDatakey(key string) ([]byte, error) {
+func (dkp *AWSKMSProvider) GenerateDatakey(key string) ([]byte, error) {
 	return dkp.GenerateDatakeyWithContext(key, nil)
 }
 
-func (dkp *DatakeyProvider) GenerateDatakeyWithContext(key string, context map[string]*string) ([]byte, error) {
+func (dkp *AWSKMSProvider) GenerateDatakeyWithContext(key string, context map[string]*string) ([]byte, error) {
 	input := &kms.GenerateDataKeyInput{
 		KeyId:   aws.String(key),
 		KeySpec: aws.String("AES_256"),
@@ -47,13 +44,13 @@ func (dkp *DatakeyProvider) GenerateDatakeyWithContext(key string, context map[s
 	datakey, err := dkp.client.GenerateDataKey(input)
 	if err != nil {
 
-		return nil, fmt.Errorf("Couldn't generate a data key using KMS: %v", awsErrorString(err))
+		return nil, fmt.Errorf("Couldn't generate a data key using KMS: %v", dkp.awsErrorString(err))
 	}
 
 	return datakey.CiphertextBlob, nil
 }
 
-func awsErrorString(err error) string {
+func (dkp *AWSKMSProvider) awsErrorString(err error) string {
 	if aerr, ok := err.(awserr.Error); ok {
 		switch aerr.Code() {
 		case kms.ErrCodeNotFoundException:

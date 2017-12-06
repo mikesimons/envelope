@@ -1,4 +1,4 @@
-package awskms
+package datakey
 
 import (
 	"fmt"
@@ -26,9 +26,9 @@ func (m *mockKMSClient) GenerateDataKey(input *kms.GenerateDataKeyInput) (*kms.G
 var _ = Describe("AWSKMS", func() {
 	Describe("New", func() {
 		It("should return AWS KMS key provider", func() {
-			dkp, err := New()
+			dkp, err := NewAWSKMS()
 			Expect(err).To(BeNil())
-			Expect(dkp).To(BeAssignableToTypeOf(&DatakeyProvider{}))
+			Expect(dkp).To(BeAssignableToTypeOf(&AWSKMSProvider{}))
 		})
 	})
 
@@ -42,7 +42,7 @@ var _ = Describe("AWSKMS", func() {
 					},
 				}
 
-				dkp := &DatakeyProvider{client: client}
+				dkp := &AWSKMSProvider{client: client}
 				key, err := dkp.GenerateDatakey("testkey")
 
 				Expect(err).To(BeNil())
@@ -63,7 +63,7 @@ var _ = Describe("AWSKMS", func() {
 					},
 				}
 
-				dkp := &DatakeyProvider{client: client}
+				dkp := &AWSKMSProvider{client: client}
 				key, err := dkp.GenerateDatakeyWithContext("testkey", context)
 
 				Expect(err).To(BeNil())
@@ -79,7 +79,7 @@ var _ = Describe("AWSKMS", func() {
 					},
 				}
 
-				dkp := &DatakeyProvider{client: client}
+				dkp := &AWSKMSProvider{client: client}
 				_, err := dkp.GenerateDatakey("testkey")
 
 				Expect(err).ToNot(BeNil())

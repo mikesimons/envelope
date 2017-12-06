@@ -1,4 +1,4 @@
-package provider_test
+package datakey_test
 
 import (
 	. "github.com/onsi/ginkgo"

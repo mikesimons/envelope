@@ -1,8 +1,7 @@
-package provider
+package datakey
 
 import (
 	"fmt"
-	"github.com/mikesimons/sekrits/datakey/provider/awskms"
 )
 
 type DatakeyProvider interface {
@@ -12,7 +11,7 @@ type DatakeyProvider interface {
 
 func Factory(name string) (DatakeyProvider, error) {
 	if name == "awskms" {
-		return awskms.New()
+		return NewAWSKMS()
 	}
 
 	return nil, fmt.Errorf("Unknown datakey provider: %s", name)
