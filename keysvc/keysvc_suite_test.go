@@ -1,4 +1,4 @@
-package datakey_test
+package keysvc_test
 
 import (
 	. "github.com/onsi/ginkgo"
@@ -9,5 +9,5 @@ import (
 
 func TestProvider(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "DatakeyProvider Suite")
+	RunSpecs(t, "Key Service Suite")
 }

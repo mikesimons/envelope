@@ -1,4 +1,4 @@
-package datakey
+package keysvc
 
 import (
 	"fmt"
@@ -28,7 +28,7 @@ var _ = Describe("AWSKMS", func() {
 		It("should return AWS KMS key provider", func() {
 			dkp, err := NewAWSKMS()
 			Expect(err).To(BeNil())
-			Expect(dkp).To(BeAssignableToTypeOf(&AWSKMSProvider{}))
+			Expect(dkp).To(BeAssignableToTypeOf(&AWSKMSService{}))
 		})
 	})
 
@@ -42,7 +42,7 @@ var _ = Describe("AWSKMS", func() {
 					},
 				}
 
-				dkp := &AWSKMSProvider{client: client}
+				dkp := &AWSKMSService{client: client}
 				key, err := dkp.GenerateDatakey("testkey")
 
 				Expect(err).To(BeNil())
@@ -63,7 +63,7 @@ var _ = Describe("AWSKMS", func() {
 					},
 				}
 
-				dkp := &AWSKMSProvider{client: client}
+				dkp := &AWSKMSService{client: client}
 				key, err := dkp.GenerateDatakeyWithContext("testkey", context)
 
 				Expect(err).To(BeNil())
@@ -79,7 +79,7 @@ var _ = Describe("AWSKMS", func() {
 					},
 				}
 
-				dkp := &AWSKMSProvider{client: client}
+				dkp := &AWSKMSService{client: client}
 				_, err := dkp.GenerateDatakey("testkey")
 
 				Expect(err).ToNot(BeNil())

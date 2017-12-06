@@ -42,6 +42,24 @@ var _ = Describe("Key", func() {
 			})
 		})
 
-		PDescribe("Unmarshal", func() {})
+		Describe("Unmarshal", func() {
+			It("should decide id, alias & ciphertext", func() {
+				inputKey := &keyring.Key{
+					Id:         uuid.NewV4(),
+					Alias:      "alias",
+					Ciphertext: []byte("test"),
+				}
+
+				marshalled, err := yaml.Marshal(inputKey)
+
+				Expect(err).To(BeNil())
+
+				outputKey := &keyring.Key{}
+				err = yaml.Unmarshal(marshalled, &outputKey)
+
+				Expect(err).To(BeNil())
+				Expect(outputKey).To(Equal(inputKey))
+			})
+		})
 	})
 })
