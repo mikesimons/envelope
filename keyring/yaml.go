@@ -3,6 +3,7 @@ package keyring
 import (
 	"fmt"
 	errors "github.com/hashicorp/errwrap"
+	"github.com/mikesimons/sekrits/keysvc"
 	"github.com/satori/go.uuid"
 	"github.com/spf13/afero"
 	"gopkg.in/yaml.v2"
@@ -12,7 +13,7 @@ import (
 
 type YAMLKeyring struct {
 	File string
-	Keys []*Key
+	Keys []*keysvc.Key
 }
 
 // LoadYAML loads a YAML file as a keyring
@@ -50,12 +51,12 @@ func LoadYAML(path string) (Keyring, error) {
 }
 
 // GetKeys returns an array of all keys in the keyring
-func (kr *YAMLKeyring) GetKeys() []*Key {
+func (kr *YAMLKeyring) GetKeys() []*keysvc.Key {
 	return kr.Keys
 }
 
 // AddKey adds a predefined key to the keyring
-func (kr *YAMLKeyring) AddKey(key *Key) error {
+func (kr *YAMLKeyring) AddKey(key *keysvc.Key) error {
 	_, idExists := kr.GetKey(key.Id.String())
 	_, aliasExists := kr.GetKey(key.Alias)
 
@@ -79,12 +80,12 @@ func (kr *YAMLKeyring) AddKey(key *Key) error {
 }
 
 // GetKey gets an individual key from the keyring
-func (kr *YAMLKeyring) GetKey(aliasOrId string) (*Key, bool) {
+func (kr *YAMLKeyring) GetKey(aliasOrId string) (*keysvc.Key, bool) {
 	id := uuid.FromStringOrNil(aliasOrId)
 	for _, k := range kr.Keys {
 		if (id != uuid.UUID{} && k.Id == id) || k.Alias == aliasOrId {
 			return k, true
 		}
 	}
-	return &Key{}, false
+	return nil, false
 }

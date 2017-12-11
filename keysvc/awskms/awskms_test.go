@@ -1,4 +1,4 @@
-package keysvc
+package awskms
 
 import (
 	"fmt"
@@ -17,16 +17,21 @@ type mockGenerateDatakeyResponse struct {
 type mockKMSClient struct {
 	kmsiface.KMSAPI
 	mockGenerateDataKey func(input *kms.GenerateDataKeyInput) (*kms.GenerateDataKeyOutput, error)
+	mockDecrypt         func(input *kms.DecryptInput) (*kms.DecryptOutput, error)
 }
 
 func (m *mockKMSClient) GenerateDataKey(input *kms.GenerateDataKeyInput) (*kms.GenerateDataKeyOutput, error) {
 	return m.mockGenerateDataKey(input)
 }
 
+func (m *mockKMSClient) Decrypt(input *kms.DecryptInput) (*kms.DecryptOutput, error) {
+	return m.mockDecrypt(input)
+}
+
 var _ = Describe("AWSKMS", func() {
 	Describe("New", func() {
 		It("should return AWS KMS key provider", func() {
-			dkp, err := NewAWSKMS()
+			dkp, err := New()
 			Expect(err).To(BeNil())
 			Expect(dkp).To(BeAssignableToTypeOf(&AWSKMSService{}))
 		})
@@ -71,6 +76,8 @@ var _ = Describe("AWSKMS", func() {
 			})
 		})
 
+		PIt("should set encryption context in generated key struct")
+
 		Context("with invalid input", func() {
 			It("should return error if generateDataKey fails", func() {
 				client := &mockKMSClient{
@@ -84,6 +91,44 @@ var _ = Describe("AWSKMS", func() {
 
 				Expect(err).ToNot(BeNil())
 			})
+		})
+	})
+
+	Describe("DecryptDatakey", func() {
+		It("should set decrypted data key as plaintext field of key", func() {
+			ciphertext := []byte("test")
+			var plaintext []byte
+
+			client := &mockKMSClient{
+				mockDecrypt: func(input *kms.DecryptInput) (*kms.DecryptOutput, error) {
+					Expect(input.CiphertextBlob).To(Equal(ciphertext))
+					return &kms.DecryptOutput{Plaintext: []byte("abcdefghijklmnopqrstuvwxyzabcdef")}, nil
+				},
+			}
+
+			dkp := &AWSKMSService{client: client}
+			err := dkp.DecryptDatakey(&ciphertext, &plaintext)
+			Expect(err).To(BeNil())
+			Expect(plaintext).To(Equal([]byte("abcdefghijklmnopqrstuvwxyzabcdef")))
+		})
+
+		It("should not decrypt a key twice", func() {
+			count := 0
+			var ciphertext []byte
+			var plaintext []byte
+
+			client := &mockKMSClient{
+				mockDecrypt: func(input *kms.DecryptInput) (*kms.DecryptOutput, error) {
+					count++
+					return &kms.DecryptOutput{Plaintext: []byte("decrypted")}, nil
+				},
+			}
+
+			dkp := &AWSKMSService{client: client}
+			dkp.DecryptDatakey(&ciphertext, &plaintext)
+			dkp.DecryptDatakey(&ciphertext, &plaintext)
+
+			Expect(count).To(Equal(1))
 		})
 	})
 })

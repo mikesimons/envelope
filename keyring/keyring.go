@@ -1,15 +1,16 @@
 package keyring
 
 import (
+	"github.com/mikesimons/sekrits/keysvc"
 	"github.com/spf13/afero"
 )
 
 var Fs = afero.NewOsFs()
 
 type Keyring interface {
-	GetKeys() []*Key
-	GetKey(aliasOrId string) (*Key, bool)
-	AddKey(*Key) error
+	GetKeys() []*keysvc.Key
+	GetKey(aliasOrId string) (*keysvc.Key, bool)
+	AddKey(*keysvc.Key) error
 }
 
 // Load loads keyring data (only YAML supported right now)

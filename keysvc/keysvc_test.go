@@ -2,22 +2,25 @@ package keysvc_test
 
 import (
 	"github.com/mikesimons/sekrits/keysvc"
+	"github.com/mikesimons/sekrits/keysvc/awskms"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Provider", func() {
-	Describe("Factory", func() {
+var _ = Describe("keysvc", func() {
+	Describe("GetKeyService", func() {
 		It("should return an AWSKMSService given awskms", func() {
-			dkp, err := keysvc.Factory("awskms")
+			dkp, err := keysvc.GetKeyService("awskms")
 			Expect(err).To(BeNil())
-			Expect(dkp).To(BeAssignableToTypeOf(&keysvc.AWSKMSService{}))
+			Expect(dkp).To(BeAssignableToTypeOf(&awskms.AWSKMSService{}))
 		})
 
 		It("should return an error given an invalid provider", func() {
-			_, err := keysvc.Factory("invalid")
+			_, err := keysvc.GetKeyService("invalid")
 			Expect(err).ToNot(BeNil())
 		})
 	})
+
+	PDescribe("GenerateDatakey", func() {})
 })

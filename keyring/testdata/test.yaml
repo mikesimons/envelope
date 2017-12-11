@@ -1,1 +1,3 @@
 - alias: first
+  type: awskms
+  key: IA==
