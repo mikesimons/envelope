@@ -4,6 +4,7 @@ import (
 	"github.com/mikesimons/sekrits/keyring"
 	"github.com/mikesimons/sekrits/sekrits"
 
+	"bytes"
 	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -62,6 +63,34 @@ var _ = Describe("Sekrits", func() {
 			_, err := sekrits.AddKey("test.yaml", "alias", fmt.Sprintf("kms://%s", testKeyId))
 			Expect(err).ToNot(BeNil())
 		})
+
+		It("should return an error if an existing keyring can't be loaded", func() {
+			keyring.Fs = afero.NewMemMapFs()
+			afero.WriteFile(keyring.Fs, "test.yaml", []byte("this\nis\nnot\nvalid\nyaml"), 0644)
+			_, err := sekrits.AddKey("test.yaml", "alias", fmt.Sprintf("awskms://%s", testKeyId))
+			Expect(err).ToNot(BeNil())
+		})
+	})
+
+	Describe("Encrypt / Decrypt", func() {
+		It("should encrypt the given secret in a way that can be decrypted", func() {
+			keyring.Fs = afero.NewMemMapFs()
+			_, err := sekrits.AddKey("test.yaml", "alias", fmt.Sprintf("awskms://%s", testKeyId))
+			Expect(err).To(BeNil())
+
+			encrypted, err := sekrits.Encrypt("test.yaml", "alias", bytes.NewReader([]byte("teststring")))
+			Expect(err).To(BeNil())
+
+			decrypted, err := sekrits.Decrypt("test.yaml", bytes.NewReader(encrypted))
+			Expect(err).To(BeNil())
+			Expect(decrypted).To(Equal([]byte("teststring")))
+		})
+
+		PIt("should return an error if an invalid key is given")
+
+		PIt("should return an error if the input can not be read")
+
+		PIt("should return an error if encryption fails")
 
 		It("should return an error if an existing keyring can't be loaded", func() {
 			keyring.Fs = afero.NewMemMapFs()

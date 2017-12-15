@@ -13,15 +13,17 @@ func main() {
 
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
-			Name:  "keyring",
-			Value: "keyring.yaml",
-			Usage: "Keyring file / url",
+			Name:   "keyring",
+			Value:  "keyring.yaml",
+			Usage:  "Keyring file / url",
 			EnvVar: "SEKRITS_KEYRING",
 		},
 	}
 
 	app.Commands = []cli.Command{
 		addKeyCommand(),
+		encryptCommand(),
+		decryptCommand(),
 	}
 
 	app.Run(os.Args)

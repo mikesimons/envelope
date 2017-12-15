@@ -52,13 +52,17 @@ func (key *Key) EncryptBytes(data []byte) ([]byte, error) {
 }
 
 func (key *Key) Decrypt(data []byte) ([]byte, error) {
-	err := key.decryptDatakey()
+	var encrypted encryptedData
+	err := bson.Unmarshal(data, &encrypted)
 	if err != nil {
 		return []byte(""), err
 	}
 
-	var encrypted encryptedData
-	err = bson.Unmarshal(data, &encrypted)
+	return key.DecryptEncryptedItem(encrypted)
+}
+
+func (key *Key) DecryptEncryptedItem(encrypted encryptedData) ([]byte, error) {
+	err := key.decryptDatakey()
 	if err != nil {
 		return []byte(""), err
 	}
