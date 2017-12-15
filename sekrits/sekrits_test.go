@@ -70,4 +70,21 @@ var _ = Describe("Sekrits", func() {
 			Expect(err).ToNot(BeNil())
 		})
 	})
+
+	Describe("Encrypt", func() {
+		PIt("should encrypt the given secret in a way that can be decrypted")
+
+		PIt("should return an error if an invalid key is given")
+
+		PIt("should return an error if the input can not be read")
+
+		PIt("should return an error if encryption fails")
+
+		It("should return an error if an existing keyring can't be loaded", func() {
+			keyring.Fs = afero.NewMemMapFs()
+			afero.WriteFile(keyring.Fs, "test.yaml", []byte("this\nis\nnot\nvalid\nyaml"), 0644)
+			_, err := sekrits.AddKey("test.yaml", "alias", fmt.Sprintf("awskms://%s", testKeyId))
+			Expect(err).ToNot(BeNil())
+		})
+	})
 })

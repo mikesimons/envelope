@@ -3,6 +3,7 @@ package keysvc
 import (
 	"fmt"
 	"github.com/mikesimons/sekrits/keysvc/awskms"
+	"gopkg.in/mgo.v2/bson"
 	"net/url"
 )
 
@@ -43,4 +44,13 @@ func GenerateDatakey(alias string, masterKey string) (*Key, error) {
 	}
 
 	return NewKey(alias, parsed.Scheme, ciphertext), nil
+}
+
+func DecodeEncrypted(data []byte) (encryptedData, error) {
+	var encrypted encryptedData
+	err := bson.Unmarshal(data, &encrypted)
+	if err != nil {
+		return encryptedData{}, err
+	}
+	return encrypted, nil
 }

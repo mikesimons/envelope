@@ -11,6 +11,7 @@ type Keyring interface {
 	GetKeys() []*keysvc.Key
 	GetKey(aliasOrId string) (*keysvc.Key, bool)
 	AddKey(*keysvc.Key) error
+	Decrypt([]byte) ([]byte, error)
 }
 
 // Load loads keyring data (only YAML supported right now)

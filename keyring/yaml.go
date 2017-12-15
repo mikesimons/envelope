@@ -50,6 +50,20 @@ func LoadYAML(path string) (Keyring, error) {
 	return keyring, nil
 }
 
+func (kr *YAMLKeyring) Decrypt(data []byte) ([]byte, error) {
+	decoded, err := keysvc.DecodeEncrypted(data)
+	if err != nil {
+		return []byte(""), err
+	}
+
+	key, ok := kr.GetKey(decoded.KeyId.String())
+	if !ok {
+		return []byte(""), fmt.Errorf("Couldn't find key %s", decoded.KeyId.String())
+	}
+
+	return key.DecryptEncryptedItem(decoded)
+}
+
 // GetKeys returns an array of all keys in the keyring
 func (kr *YAMLKeyring) GetKeys() []*keysvc.Key {
 	return kr.Keys
