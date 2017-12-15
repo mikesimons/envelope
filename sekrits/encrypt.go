@@ -1,7 +1,6 @@
 package sekrits
 
 import (
-	"encoding/base64"
 	"fmt"
 	"github.com/mikesimons/sekrits/keyring"
 	"io"
@@ -29,7 +28,5 @@ func Encrypt(keyringPath string, alias string, input io.Reader) ([]byte, error) 
 		return []byte(""), err
 	}
 
-	encoded := []byte(base64.StdEncoding.EncodeToString(encrypted))
-
-	return encoded, nil
+	return encrypted, nil
 }

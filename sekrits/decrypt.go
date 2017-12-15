@@ -1,7 +1,6 @@
 package sekrits
 
 import (
-	"encoding/base64"
 	"github.com/mikesimons/sekrits/keyring"
 	"io"
 	"io/ioutil"
@@ -18,12 +17,7 @@ func Decrypt(keyringPath string, input io.Reader) ([]byte, error) {
 		return []byte(""), err
 	}
 
-	decodedString, err := base64.StdEncoding.DecodeString(string(inputBytes))
-	if err != nil {
-		return []byte(""), err
-	}
-
-	decrypted, err := kr.Decrypt([]byte(decodedString))
+	decrypted, err := kr.Decrypt(inputBytes)
 	if err != nil {
 		return []byte(""), err
 	}

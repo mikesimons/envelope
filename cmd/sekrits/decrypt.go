@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/base64"
 	"fmt"
 	"github.com/mikesimons/sekrits/sekrits"
 	"gopkg.in/urfave/cli.v1"
@@ -30,6 +31,8 @@ func decryptCommand() cli.Command {
 			} else {
 				inputReader, _ = os.Open(input)
 			}
+
+			inputReader = base64.NewDecoder(base64.StdEncoding, inputReader)
 
 			decrypted, err := sekrits.Decrypt(keyring, inputReader)
 			if err != nil {

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/base64"
 	"fmt"
 	"github.com/mikesimons/sekrits/sekrits"
 	"gopkg.in/urfave/cli.v1"
@@ -24,7 +25,7 @@ func encryptCommand() cli.Command {
 			input := c.Args().Get(1)
 
 			var inputReader io.Reader
-			outputWriter := os.Stdout
+			outputWriter := base64.NewEncoder(base64.StdEncoding, os.Stdout)
 
 			if input == "-" {
 				inputReader = os.Stdin
