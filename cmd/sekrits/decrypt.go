@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/base64"
 	"fmt"
-	"github.com/mikesimons/sekrits/sekrits"
+	"github.com/mikesimons/sekrits"
 	"gopkg.in/urfave/cli.v1"
 	"os"
 )

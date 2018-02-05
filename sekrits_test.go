@@ -2,7 +2,7 @@ package sekrits_test
 
 import (
 	"github.com/mikesimons/sekrits/keyring"
-	"github.com/mikesimons/sekrits/sekrits"
+	"github.com/mikesimons/sekrits"
 
 	"bytes"
 	"fmt"
