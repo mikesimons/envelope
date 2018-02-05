@@ -2,6 +2,8 @@ package keysvc
 
 import (
 	"encoding/base64"
+	"fmt"
+	//errors "github.com/hashicorp/errwrap"
 	"github.com/satori/go.uuid"
 	"golang.org/x/crypto/nacl/secretbox"
 	"gopkg.in/mgo.v2/bson"
@@ -52,12 +54,10 @@ func (key *Key) EncryptBytes(data []byte) ([]byte, error) {
 }
 
 func (key *Key) Decrypt(data []byte) ([]byte, error) {
-	var encrypted encryptedData
-	err := bson.Unmarshal(data, &encrypted)
+	encrypted, err := DecodeEncrypted(data)
 	if err != nil {
 		return []byte(""), err
 	}
-
 	return key.DecryptEncryptedItem(encrypted)
 }
 
@@ -71,7 +71,11 @@ func (key *Key) DecryptEncryptedItem(encrypted encryptedData) ([]byte, error) {
 	var plaintext [32]byte
 	copy(nonce[:], encrypted.Ciphertext[:24])
 	copy(plaintext[:], key.Plaintext[:32])
-	decrypted, _ := secretbox.Open(nil, encrypted.Ciphertext[24:], &nonce, &plaintext)
+	decrypted, ok := secretbox.Open(nil, encrypted.Ciphertext[24:], &nonce, &plaintext)
+
+	if !ok {
+		return []byte(""), fmt.Errorf("Could not decrypt secret with data key; the secret may be corrupted")
+	}
 
 	return decrypted, nil
 }

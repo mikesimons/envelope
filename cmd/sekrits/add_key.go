@@ -24,7 +24,12 @@ func addKeyCommand() cli.Command {
 			alias := c.Args().Get(0)
 			providerDsn := c.Args().Get(1)
 
-			keyId, err := sekrits.AddKey(keyring, alias, providerDsn)
+			app, err := sekrits.WithYamlKeyring(keyring)
+			if err != nil {
+				return err
+			}
+
+			keyId, err := app.AddKey(alias, providerDsn)
 			if err != nil {
 				return err
 			}

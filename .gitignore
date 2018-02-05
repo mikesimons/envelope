@@ -1,2 +1,4 @@
 cmd/sekrits/sekrits
+cmd/sekrits/keyring.yaml
+cmd/sekrits/test.*
 .envrc

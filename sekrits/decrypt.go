@@ -1,25 +1,21 @@
 package sekrits
 
 import (
-	"github.com/mikesimons/sekrits/keyring"
+	"fmt"
+	errors "github.com/hashicorp/errwrap"
 	"io"
 	"io/ioutil"
 )
 
-func Decrypt(keyringPath string, input io.Reader) ([]byte, error) {
-	kr, err := keyring.Load(keyringPath)
-	if err != nil {
-		return []byte(""), err
-	}
-
+func (s *Sekrits) Decrypt(input io.Reader) ([]byte, error) {
 	inputBytes, err := ioutil.ReadAll(input)
 	if err != nil {
-		return []byte(""), err
+		return []byte(""), fmt.Errorf("error reading value: %s", err.Error())
 	}
 
-	decrypted, err := kr.Decrypt(inputBytes)
+	decrypted, err := s.Keyring.Decrypt(inputBytes)
 	if err != nil {
-		return []byte(""), err
+		return []byte(""), errors.Wrapf("error decrypting input", err)
 	}
 
 	return decrypted, nil

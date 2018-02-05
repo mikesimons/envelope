@@ -5,7 +5,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/kms"
-	//errors "github.com/hashicorp/errwrap"
+	errors "github.com/hashicorp/errwrap"
 )
 
 var awsSession = session.Must(session.NewSession())
@@ -27,10 +27,15 @@ func (dkp *AWSKMSService) DecryptDatakey(ciphertext *[]byte, plaintext *[]byte) 
 	}
 	result, err := dkp.client.Decrypt(input)
 
+	if err != nil {
+		return errors.Wrapf("Could not decrypt AWS KMS data key", err)
+	}
+
 	ret := make([]byte, len(result.Plaintext))
 	copy(ret[:], result.Plaintext[:])
 	*plaintext = ret
-	return err
+
+	return nil
 }
 
 func (dkp *AWSKMSService) GenerateDatakey(key string) ([]byte, error) {
@@ -49,7 +54,7 @@ func (dkp *AWSKMSService) GenerateDatakeyWithContext(key string, context map[str
 
 	datakey, err := dkp.client.GenerateDataKey(input)
 	if err != nil {
-		return []byte(""), fmt.Errorf("Couldn't generate a data key using KMS: %v", awsErrorString(err))
+		return []byte(""), errors.Wrapf(fmt.Sprintf("Couldn't generate a data key using AWS KMS: %v", awsErrorString(err)), err)
 	}
 
 	return datakey.CiphertextBlob, nil

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/mikesimons/sekrits/sekrits"
 	"gopkg.in/urfave/cli.v1"
-	"io"
 	"os"
 )
 
@@ -13,6 +12,12 @@ func decryptCommand() cli.Command {
 	return cli.Command{
 		Name:  "decrypt",
 		Usage: "Decrypt encrypted data",
+		Flags: []cli.Flag{
+			cli.StringFlag{
+				Name:  "as",
+				Usage: "Type of data to encrypt (blob | yaml | json | toml)",
+			},
+		},
 		Action: func(c *cli.Context) error {
 			if c.NArg() != 1 {
 				cli.ShowCommandHelp(c, "encrypt")
@@ -23,23 +28,36 @@ func decryptCommand() cli.Command {
 			keyring := c.GlobalString("keyring")
 			input := c.Args().Get(0)
 
-			var inputReader io.Reader
+			var err error
 			outputWriter := os.Stdout
 
-			if input == "-" {
-				inputReader = os.Stdin
-			} else {
-				inputReader, _ = os.Open(input)
+			inputReader, err := getInputReader(input)
+			if err != nil {
+				return processErrors(err)
 			}
 
-			inputReader = base64.NewDecoder(base64.StdEncoding, inputReader)
-
-			decrypted, err := sekrits.Decrypt(keyring, inputReader)
+			app, err := sekrits.WithYamlKeyring(keyring)
 			if err != nil {
-				return err
+				return processErrors(err)
+			}
+
+			var decrypted []byte
+			as := asFormat(c.String("as"), input)
+
+			switch as {
+			case "blob":
+				// TODO optionally read app.Prefix
+				decrypted, err = app.Decrypt(base64.NewDecoder(base64.StdEncoding, inputReader))
+			default:
+				decrypted, err = app.DecryptStructured(inputReader, as)
+			}
+
+			if err != nil {
+				return processErrors(err)
 			}
 
 			outputWriter.Write(decrypted)
+			outputWriter.Close()
 
 			return nil
 		},

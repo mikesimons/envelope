@@ -20,7 +20,8 @@ var _ = Describe("Sekrits", func() {
 	Describe("AddKey", func() {
 		It("should add a key to the keyring", func() {
 			keyring.Fs = afero.NewMemMapFs()
-			keyId, err := sekrits.AddKey("test.yaml", "alias", fmt.Sprintf("awskms://%s", testKeyId))
+			app, _ := sekrits.WithYamlKeyring("test.yaml")
+			keyId, err := app.AddKey("alias", fmt.Sprintf("awskms://%s", testKeyId))
 
 			Expect(keyId).ToNot(BeEmpty())
 			Expect(err).To(BeNil())
@@ -35,39 +36,43 @@ var _ = Describe("Sekrits", func() {
 
 		It("should return an error if the alias clashes with another key", func() {
 			keyring.Fs = afero.NewMemMapFs()
+			app, _ := sekrits.WithYamlKeyring("test.yaml")
 
-			keyId, err := sekrits.AddKey("test.yaml", "alias", fmt.Sprintf("awskms://%s", testKeyId))
+			keyId, err := app.AddKey("alias", fmt.Sprintf("awskms://%s", testKeyId))
 			Expect(err).To(BeNil())
 
-			_, err = sekrits.AddKey("test.yaml", "alias", fmt.Sprintf("awskms://%s", testKeyId))
+			_, err = app.AddKey("alias", fmt.Sprintf("awskms://%s", testKeyId))
 			Expect(err).ToNot(BeNil())
 
-			_, err = sekrits.AddKey("test.yaml", keyId, fmt.Sprintf("awskms://%s", testKeyId))
+			_, err = app.AddKey(keyId, fmt.Sprintf("awskms://%s", testKeyId))
 			Expect(err).ToNot(BeNil())
 		})
 
 		It("should return an error if the data key could not be generated", func() {
 			keyring.Fs = afero.NewMemMapFs()
-			_, err := sekrits.AddKey("test.yaml", "alias", "awskms://")
+			app, _ := sekrits.WithYamlKeyring("test.yaml")
+			_, err := app.AddKey("alias", "awskms://")
 			Expect(err).ToNot(BeNil())
 		})
 
 		It("should return an error if an invalid dsn is provided", func() {
 			keyring.Fs = afero.NewMemMapFs()
-			_, err := sekrits.AddKey("test.yaml", "alias", "://://")
+			app, _ := sekrits.WithYamlKeyring("test.yaml")
+			_, err := app.AddKey("alias", "://://")
 			Expect(err).ToNot(BeNil())
 		})
 
 		It("should return an error if an invalid key service is provided", func() {
 			keyring.Fs = afero.NewMemMapFs()
-			_, err := sekrits.AddKey("test.yaml", "alias", fmt.Sprintf("kms://%s", testKeyId))
+			app, _ := sekrits.WithYamlKeyring("test.yaml")
+			_, err := app.AddKey("alias", fmt.Sprintf("kms://%s", testKeyId))
 			Expect(err).ToNot(BeNil())
 		})
 
 		It("should return an error if an existing keyring can't be loaded", func() {
 			keyring.Fs = afero.NewMemMapFs()
 			afero.WriteFile(keyring.Fs, "test.yaml", []byte("this\nis\nnot\nvalid\nyaml"), 0644)
-			_, err := sekrits.AddKey("test.yaml", "alias", fmt.Sprintf("awskms://%s", testKeyId))
+			_, err := sekrits.WithYamlKeyring("test.yaml")
 			Expect(err).ToNot(BeNil())
 		})
 	})
@@ -75,13 +80,14 @@ var _ = Describe("Sekrits", func() {
 	Describe("Encrypt / Decrypt", func() {
 		It("should encrypt the given secret in a way that can be decrypted", func() {
 			keyring.Fs = afero.NewMemMapFs()
-			_, err := sekrits.AddKey("test.yaml", "alias", fmt.Sprintf("awskms://%s", testKeyId))
+			app, _ := sekrits.WithYamlKeyring("test.yaml")
+			_, err := app.AddKey("alias", fmt.Sprintf("awskms://%s", testKeyId))
 			Expect(err).To(BeNil())
 
-			encrypted, err := sekrits.Encrypt("test.yaml", "alias", bytes.NewReader([]byte("teststring")))
+			encrypted, err := app.Encrypt("alias", bytes.NewReader([]byte("teststring")))
 			Expect(err).To(BeNil())
 
-			decrypted, err := sekrits.Decrypt("test.yaml", bytes.NewReader(encrypted))
+			decrypted, err := app.Decrypt(bytes.NewReader(encrypted))
 			Expect(err).To(BeNil())
 			Expect(decrypted).To(Equal([]byte("teststring")))
 		})
@@ -95,8 +101,20 @@ var _ = Describe("Sekrits", func() {
 		It("should return an error if an existing keyring can't be loaded", func() {
 			keyring.Fs = afero.NewMemMapFs()
 			afero.WriteFile(keyring.Fs, "test.yaml", []byte("this\nis\nnot\nvalid\nyaml"), 0644)
-			_, err := sekrits.AddKey("test.yaml", "alias", fmt.Sprintf("awskms://%s", testKeyId))
+			_, err := sekrits.WithYamlKeyring("test.yaml")
 			Expect(err).ToNot(BeNil())
 		})
+	})
+
+	PDescribe("Decrypt structured", func() {
+		PIt("should decrypt all encrypted values in a yaml document")
+		PIt("should decrypt all encrypted values in a json document")
+		PIt("should decrypt all encrypted values in a toml document")
+		PIt("should return an error if yaml document can't be parsed")
+		PIt("should return an error if json document can't be parsed")
+		PIt("should return an error if toml document can't be parsed")
+		PIt("should return an error if document type is blob or not recognized")
+		PIt("should return an error if a value could not be decrypted")
+		PIt("should unset value if a value could not be decrypted and ignore decryption errors is set")
 	})
 })

@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/base64"
-	"fmt"
 	"github.com/mikesimons/sekrits/sekrits"
 	"gopkg.in/urfave/cli.v1"
 	"io"
@@ -13,32 +12,47 @@ func encryptCommand() cli.Command {
 	return cli.Command{
 		Name:  "encrypt",
 		Usage: "Encrypt unencrypted data",
+		Flags: []cli.Flag{
+			cli.StringFlag{
+				Name:  "with",
+				Value: "default",
+				Usage: "Encryption key alias / id",
+			},
+			cli.StringFlag{
+				Name:  "for",
+				Value: "yaml",
+				Usage: "Type of data to encrypt for (blob | yaml | json | toml)",
+			},
+		},
 		Action: func(c *cli.Context) error {
-			if c.NArg() != 2 {
-				cli.ShowCommandHelp(c, "encrypt")
-				fmt.Println("")
-				return cli.NewExitError("Error: Not enough arguments", 1)
-			}
-
 			keyring := c.GlobalString("keyring")
-			alias := c.Args().Get(0)
-			input := c.Args().Get(1)
+			alias := c.String("with")
 
-			var inputReader io.Reader
-			outputWriter := base64.NewEncoder(base64.StdEncoding, os.Stdout)
-
-			if input == "-" {
-				inputReader = os.Stdin
-			} else {
-				inputReader, _ = os.Open(input)
+			inputReader, err := getInputReader("-")
+			if err != nil {
+				return processErrors(err)
 			}
 
-			encrypted, err := sekrits.Encrypt(keyring, alias, inputReader)
+			app, err := sekrits.WithYamlKeyring(keyring)
+			if err != nil {
+				return processErrors(err)
+			}
+
+			var outputWriter io.WriteCloser
+			var encrypted []byte
+
+			outputWriter = base64.NewEncoder(base64.StdEncoding, os.Stdout)
+			encrypted, err = app.Encrypt(alias, inputReader)
 			if err != nil {
 				return err
 			}
 
+			if c.String("for") != "blob" {
+				os.Stdout.Write([]byte(app.Prefix))
+			}
+
 			outputWriter.Write(encrypted)
+			outputWriter.Close()
 
 			return nil
 		},
