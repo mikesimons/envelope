@@ -1,8 +1,8 @@
 package sekrits_test
 
 import (
-	"github.com/mikesimons/sekrits/keyring"
 	"github.com/mikesimons/sekrits"
+	"github.com/mikesimons/sekrits/keyring"
 
 	"bytes"
 	"fmt"
@@ -21,7 +21,7 @@ var _ = Describe("Sekrits", func() {
 		It("should add a key to the keyring", func() {
 			keyring.Fs = afero.NewMemMapFs()
 			app, _ := sekrits.WithYamlKeyring("test.yaml")
-			keyId, err := app.AddKey("alias", fmt.Sprintf("awskms://%s", testKeyId))
+			keyId, err := app.AddKey("alias", fmt.Sprintf("awskms://%s", testKeyId), nil)
 
 			Expect(keyId).ToNot(BeEmpty())
 			Expect(err).To(BeNil())
@@ -38,34 +38,34 @@ var _ = Describe("Sekrits", func() {
 			keyring.Fs = afero.NewMemMapFs()
 			app, _ := sekrits.WithYamlKeyring("test.yaml")
 
-			keyId, err := app.AddKey("alias", fmt.Sprintf("awskms://%s", testKeyId))
+			keyId, err := app.AddKey("alias", fmt.Sprintf("awskms://%s", testKeyId), nil)
 			Expect(err).To(BeNil())
 
-			_, err = app.AddKey("alias", fmt.Sprintf("awskms://%s", testKeyId))
+			_, err = app.AddKey("alias", fmt.Sprintf("awskms://%s", testKeyId), nil)
 			Expect(err).ToNot(BeNil())
 
-			_, err = app.AddKey(keyId, fmt.Sprintf("awskms://%s", testKeyId))
+			_, err = app.AddKey(keyId, fmt.Sprintf("awskms://%s", testKeyId), nil)
 			Expect(err).ToNot(BeNil())
 		})
 
 		It("should return an error if the data key could not be generated", func() {
 			keyring.Fs = afero.NewMemMapFs()
 			app, _ := sekrits.WithYamlKeyring("test.yaml")
-			_, err := app.AddKey("alias", "awskms://")
+			_, err := app.AddKey("alias", "awskms://", nil)
 			Expect(err).ToNot(BeNil())
 		})
 
 		It("should return an error if an invalid dsn is provided", func() {
 			keyring.Fs = afero.NewMemMapFs()
 			app, _ := sekrits.WithYamlKeyring("test.yaml")
-			_, err := app.AddKey("alias", "://://")
+			_, err := app.AddKey("alias", "://://", nil)
 			Expect(err).ToNot(BeNil())
 		})
 
 		It("should return an error if an invalid key service is provided", func() {
 			keyring.Fs = afero.NewMemMapFs()
 			app, _ := sekrits.WithYamlKeyring("test.yaml")
-			_, err := app.AddKey("alias", fmt.Sprintf("kms://%s", testKeyId))
+			_, err := app.AddKey("alias", fmt.Sprintf("kms://%s", testKeyId), nil)
 			Expect(err).ToNot(BeNil())
 		})
 
@@ -81,7 +81,7 @@ var _ = Describe("Sekrits", func() {
 		It("should encrypt the given secret in a way that can be decrypted", func() {
 			keyring.Fs = afero.NewMemMapFs()
 			app, _ := sekrits.WithYamlKeyring("test.yaml")
-			_, err := app.AddKey("alias", fmt.Sprintf("awskms://%s", testKeyId))
+			_, err := app.AddKey("alias", fmt.Sprintf("awskms://%s", testKeyId), nil)
 			Expect(err).To(BeNil())
 
 			encrypted, err := app.Encrypt("alias", bytes.NewReader([]byte("teststring")))

@@ -17,13 +17,14 @@ func New() (*AWSKMSService, error) {
 	}, nil
 }
 
-func (dkp *AWSKMSService) DecryptDatakey(ciphertext *[]byte, plaintext *[]byte) error {
+func (dkp *AWSKMSService) DecryptDatakey(ciphertext *[]byte, plaintext *[]byte, context map[string]string) error {
 	if len(*plaintext) > 0 {
 		return nil
 	}
 
 	input := &kms.DecryptInput{
-		CiphertextBlob: *ciphertext,
+		CiphertextBlob:    *ciphertext,
+		EncryptionContext: convertContext(context),
 	}
 	result, err := dkp.client.Decrypt(input)
 
@@ -38,18 +39,14 @@ func (dkp *AWSKMSService) DecryptDatakey(ciphertext *[]byte, plaintext *[]byte) 
 	return nil
 }
 
-func (dkp *AWSKMSService) GenerateDatakey(key string) ([]byte, error) {
-	return dkp.GenerateDatakeyWithContext(key, nil)
-}
-
-func (dkp *AWSKMSService) GenerateDatakeyWithContext(key string, context map[string]*string) ([]byte, error) {
+func (dkp *AWSKMSService) GenerateDatakey(key string, context map[string]string) ([]byte, error) {
 	input := &kms.GenerateDataKeyInput{
 		KeyId:   aws.String(key),
 		KeySpec: aws.String("AES_256"),
 	}
 
 	if context != nil {
-		input.EncryptionContext = context
+		input.EncryptionContext = convertContext(context)
 	}
 
 	datakey, err := dkp.client.GenerateDataKey(input)
@@ -58,4 +55,14 @@ func (dkp *AWSKMSService) GenerateDatakeyWithContext(key string, context map[str
 	}
 
 	return datakey.CiphertextBlob, nil
+}
+
+func convertContext(input map[string]string) map[string]*string {
+	values := make([]string, len(input))
+	output := make(map[string]*string)
+	for k, v := range input {
+		values = append(values, v)
+		output[k] = &values[len(values)-1]
+	}
+	return output
 }

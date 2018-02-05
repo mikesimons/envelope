@@ -4,8 +4,8 @@ import (
 	"github.com/mikesimons/sekrits/keysvc"
 )
 
-func (s *Sekrits) AddKey(alias string, masterKey string) (string, error) {
-	key, err := keysvc.GenerateDatakey(alias, masterKey)
+func (s *Sekrits) AddKey(alias string, masterKey string, context map[string]string) (string, error) {
+	key, err := keysvc.GenerateDatakey(alias, masterKey, context)
 	if err != nil {
 		return "", err
 	}

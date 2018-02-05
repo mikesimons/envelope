@@ -8,24 +8,24 @@ import (
 )
 
 type TestKeyService struct {
-	mockGenerateDatakey func(string) ([]byte, error)
-	mockDecryptDatakey  func(*[]byte, *[]byte) error
+	mockGenerateDatakey func(string, map[string]string) ([]byte, error)
+	mockDecryptDatakey  func(*[]byte, *[]byte, map[string]string) error
 }
 
-func (t *TestKeyService) GenerateDatakey(master string) ([]byte, error) {
-	return t.mockGenerateDatakey(master)
+func (t *TestKeyService) GenerateDatakey(master string, context map[string]string) ([]byte, error) {
+	return t.mockGenerateDatakey(master, context)
 }
 
-func (t *TestKeyService) DecryptDatakey(ciphertext *[]byte, plaintext *[]byte) error {
-	return t.mockDecryptDatakey(ciphertext, plaintext)
+func (t *TestKeyService) DecryptDatakey(ciphertext *[]byte, plaintext *[]byte, context map[string]string) error {
+	return t.mockDecryptDatakey(ciphertext, plaintext, context)
 }
 
 func NewTestKeyService() (KeyServiceProvider, error) {
 	return &TestKeyService{
-		mockGenerateDatakey: func(master string) ([]byte, error) {
+		mockGenerateDatakey: func(master string, context map[string]string) ([]byte, error) {
 			return []byte(""), nil
 		},
-		mockDecryptDatakey: func(ciphertext *[]byte, plaintext *[]byte) error {
+		mockDecryptDatakey: func(ciphertext *[]byte, plaintext *[]byte, context map[string]string) error {
 			*plaintext = make([]byte, 32)
 			return nil
 		},
@@ -35,7 +35,7 @@ func NewTestKeyService() (KeyServiceProvider, error) {
 var _ = Describe("Key", func() {
 	Describe("NewKey", func() {
 		It("should return a new key with alias, cipher text and id", func() {
-			key := NewKey("alias", "test", []byte("ciphertext"))
+			key := NewKey("alias", "test", []byte("ciphertext"), nil)
 			Expect(key.Alias).To(Equal("alias"))
 			Expect(key.Ciphertext).To(Equal([]byte("ciphertext")))
 			Expect(key.Id).NotTo(BeAssignableToTypeOf(&uuid.UUID{}))
@@ -46,7 +46,7 @@ var _ = Describe("Key", func() {
 		It("should encrypt given data with key in a way that can be decrypted only given encrypted blob", func() {
 			AddKeyServiceFn("test", NewTestKeyService)
 
-			key := NewKey("alias", "test", []byte("test"))
+			key := NewKey("alias", "test", []byte("test"), nil)
 
 			encrypted, err := key.EncryptBytes([]byte("hello"))
 			Expect(err).To(BeNil())
@@ -60,33 +60,48 @@ var _ = Describe("Key", func() {
 
 	Describe("Custom YAML", func() {
 		Describe("Marshal", func() {
-			It("should encode id, alias & ciphertext", func() {
+			It("should encode id, alias, ciphertext & context", func() {
+				context := map[string]string{
+					"key": "value",
+				}
+
 				key := &Key{
 					Id:         uuid.NewV4(),
 					Alias:      "alias",
 					Ciphertext: []byte("test"),
+					Context:    context,
 				}
 
 				marshalled, err := yaml.Marshal(key)
 
 				Expect(err).To(BeNil())
 
-				verify := make(map[string]string)
+				verify := make(map[string]interface{})
 				err = yaml.Unmarshal(marshalled, &verify)
 
 				Expect(err).To(BeNil())
 				Expect(verify["id"]).To(Equal(key.Id.String()))
 				Expect(verify["alias"]).To(Equal("alias"))
 				Expect(verify["key"]).To(Equal("dGVzdA==")) // Base64 encoded "test"
+
+				verifyContext := map[interface{}]interface{}{
+					"key": "value",
+				}
+				Expect(verify["context"]).To(Equal(verifyContext))
 			})
 		})
 
 		Describe("Unmarshal", func() {
-			It("should decide id, alias & ciphertext", func() {
+			It("should decode id, alias, ciphertext & context", func() {
+				context := map[string]string{
+					"key": "value",
+				}
+
 				inputKey := &Key{
 					Id:         uuid.NewV4(),
 					Alias:      "alias",
 					Ciphertext: []byte("test"),
+					Context:    context,
 				}
 
 				marshalled, err := yaml.Marshal(inputKey)

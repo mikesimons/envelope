@@ -2,7 +2,6 @@ package awskms
 
 import (
 	"fmt"
-	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/kms"
 	"github.com/aws/aws-sdk-go/service/kms/kmsiface"
 	. "github.com/onsi/ginkgo"
@@ -39,37 +38,23 @@ var _ = Describe("AWSKMS", func() {
 
 	Describe("GenerateDataKey", func() {
 		Context("with valid input", func() {
-			It("should create a data key", func() {
-				client := &mockKMSClient{
-					mockGenerateDataKey: func(input *kms.GenerateDataKeyInput) (*kms.GenerateDataKeyOutput, error) {
-						Expect(*input.KeyId).To(Equal("testkey"))
-						return &kms.GenerateDataKeyOutput{CiphertextBlob: []byte("test")}, nil
-					},
-				}
-
-				dkp := &AWSKMSService{client: client}
-				key, err := dkp.GenerateDatakey("testkey")
-
-				Expect(err).To(BeNil())
-				Expect(key).To(Equal([]byte("test")))
-			})
-
 			It("should create a data key with encryption context", func() {
-				context := map[string]*string{
-					"key1": aws.String("val"),
-					"key2": aws.String("val"),
+				context := map[string]string{
+					"key1": "val",
+					"key2": "val",
 				}
 
 				client := &mockKMSClient{
 					mockGenerateDataKey: func(input *kms.GenerateDataKeyInput) (*kms.GenerateDataKeyOutput, error) {
 						Expect(*input.KeyId).To(Equal("testkey"))
-						Expect(input.EncryptionContext).To(Equal(context))
+						Expect(*input.EncryptionContext["key1"]).To(Equal("val"))
+						Expect(*input.EncryptionContext["key2"]).To(Equal("val"))
 						return &kms.GenerateDataKeyOutput{CiphertextBlob: []byte("test")}, nil
 					},
 				}
 
 				dkp := &AWSKMSService{client: client}
-				key, err := dkp.GenerateDatakeyWithContext("testkey", context)
+				key, err := dkp.GenerateDatakey("testkey", context)
 
 				Expect(err).To(BeNil())
 				Expect(key).To(Equal([]byte("test")))
@@ -87,7 +72,7 @@ var _ = Describe("AWSKMS", func() {
 				}
 
 				dkp := &AWSKMSService{client: client}
-				_, err := dkp.GenerateDatakey("testkey")
+				_, err := dkp.GenerateDatakey("testkey", nil)
 
 				Expect(err).ToNot(BeNil())
 			})
@@ -107,7 +92,7 @@ var _ = Describe("AWSKMS", func() {
 			}
 
 			dkp := &AWSKMSService{client: client}
-			err := dkp.DecryptDatakey(&ciphertext, &plaintext)
+			err := dkp.DecryptDatakey(&ciphertext, &plaintext, nil)
 			Expect(err).To(BeNil())
 			Expect(plaintext).To(Equal([]byte("abcdefghijklmnopqrstuvwxyzabcdef")))
 		})
@@ -125,8 +110,8 @@ var _ = Describe("AWSKMS", func() {
 			}
 
 			dkp := &AWSKMSService{client: client}
-			dkp.DecryptDatakey(&ciphertext, &plaintext)
-			dkp.DecryptDatakey(&ciphertext, &plaintext)
+			dkp.DecryptDatakey(&ciphertext, &plaintext, nil)
+			dkp.DecryptDatakey(&ciphertext, &plaintext, nil)
 
 			Expect(count).To(Equal(1))
 		})

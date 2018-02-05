@@ -58,7 +58,7 @@ var _ = Describe("YAMLKeyring", func() {
 				populateTestFile("testdata/test.yaml", "test.yaml", keyring.Fs)
 				kr, _ := keyring.LoadYAML("test.yaml")
 
-				kr.AddKey(keysvc.NewKey("second", "test", []byte("")))
+				kr.AddKey(keysvc.NewKey("second", "test", []byte(""), nil))
 
 				keys := kr.GetKeys()
 				contents, _ := afero.ReadFile(keyring.Fs, "test.yaml")
@@ -73,7 +73,7 @@ var _ = Describe("YAMLKeyring", func() {
 				keyring.Fs = afero.NewMemMapFs()
 				kr, _ := keyring.LoadYAML("test.yaml")
 
-				kr.AddKey(keysvc.NewKey("first", "test", []byte("")))
+				kr.AddKey(keysvc.NewKey("first", "test", []byte(""), nil))
 
 				keys := kr.GetKeys()
 				contents, _ := afero.ReadFile(keyring.Fs, "test.yaml")
@@ -88,7 +88,7 @@ var _ = Describe("YAMLKeyring", func() {
 			populateTestFile("testdata/test.yaml", "test.yaml", keyring.Fs)
 			kr, _ := keyring.LoadYAML("test.yaml")
 
-			err := kr.AddKey(keysvc.NewKey("first", "test", []byte("")))
+			err := kr.AddKey(keysvc.NewKey("first", "test", []byte(""), nil))
 
 			Expect(err).ToNot(BeNil())
 		})

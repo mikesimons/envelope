@@ -28,7 +28,7 @@ func GetKeyService(name string) (KeyServiceProvider, error) {
 	return nil, fmt.Errorf("Unknown key service: %s", name)
 }
 
-func GenerateDatakey(alias string, masterKey string) (*Key, error) {
+func GenerateDatakey(alias string, masterKey string, context map[string]string) (*Key, error) {
 	parsed, err := url.Parse(masterKey)
 	if err != nil {
 		return nil, errors.Wrapf("Could not parse master key URL", err)
@@ -39,12 +39,12 @@ func GenerateDatakey(alias string, masterKey string) (*Key, error) {
 		return nil, errors.Wrapf("Could not initialize key service", err)
 	}
 
-	ciphertext, err := keysvc.GenerateDatakey(fmt.Sprintf("%s%s", parsed.Host, parsed.Path))
+	ciphertext, err := keysvc.GenerateDatakey(fmt.Sprintf("%s%s", parsed.Host, parsed.Path), context)
 	if err != nil {
 		return nil, errors.Wrapf("Could not generate data key", err)
 	}
 
-	return NewKey(alias, parsed.Scheme, ciphertext), nil
+	return NewKey(alias, parsed.Scheme, ciphertext, context), nil
 }
 
 func DecodeEncrypted(data []byte) (encryptedData, error) {
