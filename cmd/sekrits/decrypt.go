@@ -3,9 +3,10 @@ package main
 import (
 	"encoding/base64"
 	"fmt"
+	"os"
+
 	"github.com/mikesimons/sekrits"
 	"gopkg.in/urfave/cli.v1"
-	"os"
 )
 
 func decryptCommand() cli.Command {
@@ -20,7 +21,7 @@ func decryptCommand() cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 			if c.NArg() != 1 {
-				cli.ShowCommandHelp(c, "encrypt")
+				cli.ShowCommandHelp(c, "decrypt")
 				fmt.Println("")
 				return cli.NewExitError("Error: Not enough arguments", 1)
 			}
