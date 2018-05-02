@@ -11,8 +11,9 @@ import (
 
 func encryptCommand() cli.Command {
 	return cli.Command{
-		Name:  "encrypt",
-		Usage: "Encrypt unencrypted data",
+		Name:      "encrypt",
+		Usage:     "Encrypt unencrypted data",
+		ArgsUsage: "<file>",
 		Flags: []cli.Flag{
 			cli.StringFlag{
 				Name:  "key",
@@ -28,7 +29,8 @@ func encryptCommand() cli.Command {
 			keyring := c.GlobalString("keyring")
 			alias := c.String("key")
 
-			inputReader, err := getInputReader("-")
+			file := c.Args().Get(0)
+			inputReader, err := getInputReader(file)
 			if err != nil {
 				return processErrors(err)
 			}
