@@ -8,7 +8,7 @@ import (
 func main() {
 	app := cli.NewApp()
 	app.Name = "sekrits"
-	app.Usage = "Secrets management that doesn't suck"
+	app.Usage = "Secrets encryption that doesn't suck"
 	app.Version = "0.0.1"
 
 	app.Flags = []cli.Flag{
