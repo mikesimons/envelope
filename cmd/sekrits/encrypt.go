@@ -2,10 +2,11 @@ package main
 
 import (
 	"encoding/base64"
-	"github.com/mikesimons/sekrits"
-	"gopkg.in/urfave/cli.v1"
 	"io"
 	"os"
+
+	"github.com/mikesimons/sekrits"
+	"gopkg.in/urfave/cli.v1"
 )
 
 func encryptCommand() cli.Command {
@@ -14,19 +15,18 @@ func encryptCommand() cli.Command {
 		Usage: "Encrypt unencrypted data",
 		Flags: []cli.Flag{
 			cli.StringFlag{
-				Name:  "with",
+				Name:  "key",
 				Value: "default",
 				Usage: "Encryption key alias / id",
 			},
-			cli.StringFlag{
-				Name:  "for",
-				Value: "yaml",
-				Usage: "Type of data to encrypt for (blob | yaml | json | toml)",
+			cli.BoolFlag{
+				Name:  "blob",
+				Usage: "Encrypt as blob",
 			},
 		},
 		Action: func(c *cli.Context) error {
 			keyring := c.GlobalString("keyring")
-			alias := c.String("with")
+			alias := c.String("key")
 
 			inputReader, err := getInputReader("-")
 			if err != nil {
@@ -47,7 +47,7 @@ func encryptCommand() cli.Command {
 				return err
 			}
 
-			if c.String("for") != "blob" {
+			if !c.Bool("blob") {
 				os.Stdout.Write([]byte(app.Prefix))
 			}
 
