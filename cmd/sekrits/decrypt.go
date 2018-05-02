@@ -15,7 +15,7 @@ func decryptCommand() cli.Command {
 		Usage: "Decrypt encrypted data",
 		Flags: []cli.Flag{
 			cli.StringFlag{
-				Name:  "as",
+				Name:  "format",
 				Usage: "Type of data to encrypt (blob | yaml | json | toml)",
 			},
 		},
@@ -43,7 +43,7 @@ func decryptCommand() cli.Command {
 			}
 
 			var decrypted []byte
-			as := asFormat(c.String("as"), input)
+			as := asFormat(c.String("format"), input)
 
 			switch as {
 			case "blob":
