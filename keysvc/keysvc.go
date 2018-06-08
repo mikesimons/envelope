@@ -2,10 +2,11 @@ package keysvc
 
 import (
 	"fmt"
-	errors "github.com/hashicorp/errwrap"
+	"net/url"
+
+	"github.com/ansel1/merry"
 	"github.com/mikesimons/sekrits/keysvc/awskms"
 	"gopkg.in/mgo.v2/bson"
-	"net/url"
 )
 
 func awsKeySvcFn() (KeyServiceProvider, error) {
@@ -31,17 +32,25 @@ func GetKeyService(name string) (KeyServiceProvider, error) {
 func GenerateDatakey(alias string, masterKey string, context map[string]string) (*Key, error) {
 	parsed, err := url.Parse(masterKey)
 	if err != nil {
-		return nil, errors.Wrapf("Could not parse master key URL", err)
+		return nil, merry.Wrap(err).
+			WithUserMessage("Could not parse master key URL").
+			WithValue("master key", masterKey).
+			WithValue("alias", alias)
 	}
 
 	keysvc, err := GetKeyService(parsed.Scheme)
 	if err != nil {
-		return nil, errors.Wrapf("Could not initialize key service", err)
+		return nil, merry.Wrap(err).
+			WithUserMessage("Could not initialize key service").
+			WithValue("master key", masterKey).
+			WithValue("alias", alias)
 	}
 
 	ciphertext, err := keysvc.GenerateDatakey(fmt.Sprintf("%s%s", parsed.Host, parsed.Path), context)
 	if err != nil {
-		return nil, errors.Wrapf("Could not generate data key", err)
+		return nil, merry.Wrap(err).
+			WithValue("master key", masterKey).
+			WithValue("alias", alias)
 	}
 
 	return NewKey(alias, parsed.Scheme, ciphertext, context), nil
@@ -51,7 +60,8 @@ func DecodeEncrypted(data []byte) (encryptedData, error) {
 	var encrypted encryptedData
 	err := bson.Unmarshal(data, &encrypted)
 	if err != nil {
-		return encryptedData{}, errors.Wrapf("Could not decode an encrypted item; it is possibly corrupted", err)
+		return encryptedData{}, merry.Wrap(err).
+			WithUserMessage("Could not decode an encrypted item; it is possibly corrupted")
 	}
 	return encrypted, nil
 }

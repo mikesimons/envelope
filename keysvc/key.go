@@ -4,10 +4,12 @@ import (
 	"encoding/base64"
 	"fmt"
 	//errors "github.com/hashicorp/errwrap"
+	"math/rand"
+
+	"github.com/ansel1/merry"
 	"github.com/satori/go.uuid"
 	"golang.org/x/crypto/nacl/secretbox"
 	"gopkg.in/mgo.v2/bson"
-	"math/rand"
 )
 
 // NewKey builds a new key with the given alias / encrypted data key
@@ -29,7 +31,7 @@ func (key *Key) decryptDatakey() error {
 
 	err = keysvc.DecryptDatakey(&key.Ciphertext, &key.Plaintext, key.Context)
 	if err != nil {
-		return err
+		return merry.Wrap(err).WithValue("keyid", key.Id.String())
 	}
 
 	return nil

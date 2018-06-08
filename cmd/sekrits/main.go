@@ -1,9 +1,13 @@
 package main
 
 import (
-	"gopkg.in/urfave/cli.v1"
 	"os"
+
+	"github.com/ansel1/merry"
+	"gopkg.in/urfave/cli.v1"
 )
+
+var COLLECT_DEBUG = true
 
 func main() {
 	app := cli.NewApp()
@@ -25,6 +29,8 @@ func main() {
 		encryptCommand(),
 		decryptCommand(),
 	}
+
+	merry.SetStackCaptureEnabled(COLLECT_DEBUG)
 
 	app.Run(os.Args)
 }

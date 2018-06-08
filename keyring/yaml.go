@@ -1,14 +1,14 @@
 package keyring
 
 import (
-	"fmt"
-	errors "github.com/hashicorp/errwrap"
+	"io/ioutil"
+	"os"
+
+	"github.com/ansel1/merry"
 	"github.com/mikesimons/sekrits/keysvc"
 	"github.com/satori/go.uuid"
 	"github.com/spf13/afero"
 	"gopkg.in/yaml.v2"
-	"io/ioutil"
-	"os"
 )
 
 type YAMLKeyring struct {
@@ -33,18 +33,18 @@ func LoadYAML(path string) (Keyring, error) {
 
 	file, err := Fs.Open(path)
 	if err != nil {
-		return keyring, errors.Wrapf("Couldn't open keyring file", err)
+		return keyring, merry.Wrap(err).WithUserMessage("Couldn't open keyring file")
 	}
 
 	bytes, err := ioutil.ReadAll(file)
 	if err != nil {
-		return keyring, errors.Wrapf("Couldn't read keyring file", err)
+		return keyring, merry.Wrap(err).WithUserMessage("Couldn't read keyring file")
 	}
 
 	err = yaml.Unmarshal(bytes, &keyring.Keys)
 
 	if err != nil {
-		return keyring, errors.Wrapf("Couldn't parse YAML keyring data", err)
+		return keyring, merry.Wrap(err).WithUserMessage("Couldn't parse YAML keyring data")
 	}
 
 	return keyring, nil
@@ -58,7 +58,7 @@ func (kr *YAMLKeyring) Decrypt(data []byte) ([]byte, error) {
 
 	key, ok := kr.GetKey(decoded.KeyId.String())
 	if !ok {
-		return []byte(""), fmt.Errorf("Couldn't find key %s", decoded.KeyId.String())
+		return []byte(""), merry.New("Couldn't find key").WithValue("keyid", decoded.KeyId.String())
 	}
 
 	return key.DecryptEncryptedItem(decoded)
@@ -75,20 +75,22 @@ func (kr *YAMLKeyring) AddKey(key *keysvc.Key) error {
 	_, aliasExists := kr.GetKey(key.Alias)
 
 	if idExists || aliasExists {
-		return fmt.Errorf("Couldn't add key because '%s' clashes with an existing key alias or id", key.Alias)
+		return merry.New("Couldn't add key because it clashes with an existing key alias or id").
+			WithValue("keyid", key.Id.String()).
+			WithValue("alias", key.Alias)
 	}
 
 	kr.Keys = append(kr.Keys, key)
 
 	updated, err := yaml.Marshal(kr.Keys)
 	if err != nil {
-		return errors.Wrapf("Couldn't add key", err)
+		return merry.Wrap(err).WithUserMessage("Couldn't add key")
 	}
 
 	err = afero.WriteFile(Fs, kr.File, updated, 0644)
 
 	if err != nil {
-		return errors.Wrapf("Couldn't add key", err)
+		return merry.Wrap(err).WithUserMessage("Couldn't add key")
 	}
 	return nil
 }

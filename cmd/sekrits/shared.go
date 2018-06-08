@@ -2,12 +2,12 @@ package main
 
 import (
 	"fmt"
-	errors "github.com/hashicorp/errwrap"
-	"gopkg.in/urfave/cli.v1"
 	"io"
 	"os"
 	"regexp"
 	"strings"
+
+	"github.com/ansel1/merry"
 )
 
 func asFormat(as string, input string) string {
@@ -41,11 +41,32 @@ func asFormat(as string, input string) string {
 }
 
 func processErrors(err error) error {
-	ret := cli.MultiError{}
-	errors.Walk(err, func(err error) {
-		ret.Errors = append(ret.Errors, err)
-	})
-	return fmt.Errorf(ret.Error())
+	var lines []string
+	e := merry.Wrap(err)
+
+	if msg := merry.UserMessage(e); msg != "" {
+		lines = append(lines, fmt.Sprintf("%s\n", msg))
+	}
+
+	if msg := merry.Message(e); msg != "" {
+		lines = append(lines, fmt.Sprintf("%s\n", msg))
+	}
+
+	if COLLECT_DEBUG {
+		lines = append(lines, merry.Stacktrace(e))
+	}
+
+	var extra []string
+	for k, v := range merry.Values(e) {
+		k = fmt.Sprintf("%v", k)
+		if k == "stack" || k == "message" || k == "user message" {
+			continue
+		}
+		extra = append(extra, fmt.Sprintf("%v: %v", k, v))
+	}
+	lines = append(lines, strings.Join(extra, ", "))
+
+	return fmt.Errorf(strings.Join(lines, "\n"))
 }
 
 func getInputReader(input string) (io.Reader, error) {
@@ -55,7 +76,7 @@ func getInputReader(input string) (io.Reader, error) {
 
 	reader, err := os.Open(input)
 	if err != nil {
-		return reader, errors.Wrapf("Couldn't open file: {{err}}", err)
+		return reader, merry.Wrap(err).WithValue("input", input)
 	}
 
 	return reader, nil

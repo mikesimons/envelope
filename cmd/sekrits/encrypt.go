@@ -46,7 +46,7 @@ func encryptCommand() cli.Command {
 			outputWriter = base64.NewEncoder(base64.StdEncoding, os.Stdout)
 			encrypted, err = app.Encrypt(alias, inputReader)
 			if err != nil {
-				return err
+				return processErrors(err)
 			}
 
 			if !c.Bool("blob") {

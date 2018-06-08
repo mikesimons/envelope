@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
+	"net/url"
+
 	errors "github.com/hashicorp/errwrap"
 	"github.com/mikesimons/sekrits"
 	"gopkg.in/urfave/cli.v1"
-	"net/url"
 )
 
 // addKeyCommand implements the add-key command
@@ -33,17 +34,17 @@ func addKeyCommand() cli.Command {
 			providerDsn := c.Args().Get(1)
 			context, err := parseEncryptionContext(c.String("context"))
 			if err != nil {
-				return err
+				return processErrors(err)
 			}
 
 			app, err := sekrits.WithYamlKeyring(keyring)
 			if err != nil {
-				return err
+				return processErrors(err)
 			}
 
 			keyId, err := app.AddKey(alias, providerDsn, context)
 			if err != nil {
-				return err
+				return processErrors(err)
 			}
 
 			fmt.Printf("Added key %s (%s)", keyId, alias)
