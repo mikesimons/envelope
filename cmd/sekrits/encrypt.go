@@ -30,6 +30,10 @@ func encryptCommand() cli.Command {
 			alias := c.String("key")
 
 			file := c.Args().Get(0)
+			if file == "" {
+				file = "-"
+			}
+
 			inputReader, err := getInputReader(file)
 			if err != nil {
 				return processErrors(err)
