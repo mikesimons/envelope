@@ -81,3 +81,34 @@ func getInputReader(input string) (io.Reader, error) {
 
 	return reader, nil
 }
+
+type TrimReader struct {
+	r io.Reader
+}
+
+func NewTrimReader(r io.Reader) io.Reader {
+	return &TrimReader{r: r}
+}
+
+func (t *TrimReader) Read(p []byte) (n int, err error) {
+	count, err := t.r.Read(p)
+	if count < len(p) && err == nil {
+		pos := count
+		for pos >= 0 {
+			eval := p[:pos][len(p[:pos])-1]
+			if eval == byte(0) || eval == byte('\n') || eval == byte('\r') {
+				pos = pos - 1
+				continue
+			} else {
+				break
+			}
+		}
+
+		for i := pos; i < count; i++ {
+			p[i] = byte(0)
+		}
+
+		return pos, err
+	}
+	return count, err
+}

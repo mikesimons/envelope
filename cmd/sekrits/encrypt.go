@@ -24,6 +24,10 @@ func encryptCommand() cli.Command {
 				Name:  "blob",
 				Usage: "Encrypt as blob",
 			},
+			cli.BoolFlag{
+				Name:  "notrim",
+				Usage: "Do not trim newlines from end of input",
+			},
 		},
 		Action: func(c *cli.Context) error {
 			keyring := c.GlobalString("keyring")
@@ -37,6 +41,10 @@ func encryptCommand() cli.Command {
 			inputReader, err := getInputReader(file)
 			if err != nil {
 				return processErrors(err)
+			}
+
+			if !c.Bool("notrim") {
+				inputReader = NewTrimReader(inputReader)
 			}
 
 			app, err := sekrits.WithYamlKeyring(keyring)
