@@ -4,8 +4,12 @@ import (
 	"encoding/base64"
 	"fmt"
 	"os"
+	"reflect"
+
+	"log"
 
 	"github.com/mikesimons/sekrits"
+	"github.com/mikesimons/traverser"
 	"gopkg.in/urfave/cli.v1"
 )
 
@@ -17,6 +21,19 @@ func decryptCommand() cli.Command {
 			cli.StringFlag{
 				Name:  "format",
 				Usage: "Type of data to encrypt (blob | yaml | json | toml)",
+			},
+			cli.BoolFlag{
+				Name:  "unset-errors",
+				Usage: "Unset keys if they can't be decrypted (only applies to structured decryption)",
+			},
+			cli.StringFlag{
+				Name:  "default-error-value",
+				Usage: "Set keys to this value if they can't be decrypted (only applies to structured decryption)",
+				Value: "ERROR",
+			},
+			cli.BoolFlag{
+				Name:  "ignore-errors",
+				Usage: "Ignore decryption errors and leave the encrypted string in place (only applies to structured decryption)",
 			},
 		},
 		Action: func(c *cli.Context) error {
@@ -47,9 +64,9 @@ func decryptCommand() cli.Command {
 
 			switch as {
 			case "blob":
-				// TODO optionally read app.Prefix
 				decrypted, err = app.Decrypt(base64.NewDecoder(base64.StdEncoding, inputReader))
 			default:
+				app.StructuredErrorBehaviour = structuredErrorHandler(c)
 				decrypted, err = app.DecryptStructured(inputReader, as)
 			}
 
@@ -62,5 +79,26 @@ func decryptCommand() cli.Command {
 
 			return nil
 		},
+	}
+}
+
+func structuredErrorHandler(c *cli.Context) func(error) (traverser.Op, error) {
+	if c.Bool("ignore-errors") {
+		return func(e error) (traverser.Op, error) {
+			log.Print(e)
+			return traverser.Noop()
+		}
+	}
+
+	if c.Bool("unset-errors") {
+		return func(e error) (traverser.Op, error) {
+			log.Print(e)
+			return traverser.Unset()
+		}
+	}
+
+	return func(e error) (traverser.Op, error) {
+		log.Print(e)
+		return traverser.Set(reflect.ValueOf(c.String("default-error-value")))
 	}
 }

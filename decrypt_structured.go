@@ -40,7 +40,7 @@ func (s *Sekrits) DecryptStructured(input io.Reader, format string) ([]byte, err
 				decrypted, err := s.Decrypt(inputReader)
 
 				if err != nil {
-					return traverser.Error(errors.Wrapf("Could not decrypt map value", err))
+					return s.StructuredErrorBehaviour(merry.Wrap(err).WithValue("key", strings.Join(keys, ".")))
 				}
 
 				return traverser.Set(reflect.ValueOf(string(decrypted)))
