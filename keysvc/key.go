@@ -31,7 +31,9 @@ func (key *Key) decryptDatakey() error {
 
 	err = keysvc.DecryptDatakey(&key.Ciphertext, &key.Plaintext, key.Context)
 	if err != nil {
-		return merry.Wrap(err).WithValue("keyid", key.Id.String())
+		return merry.Wrap(err).
+			WithValue("keyring id", key.Id.String()).
+			WithValue("keyring alias", key.Alias)
 	}
 
 	return nil

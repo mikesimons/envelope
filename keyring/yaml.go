@@ -58,7 +58,7 @@ func (kr *YAMLKeyring) Decrypt(data []byte) ([]byte, error) {
 
 	key, ok := kr.GetKey(decoded.KeyId.String())
 	if !ok {
-		return []byte(""), merry.New("Couldn't find key").WithValue("keyid", decoded.KeyId.String())
+		return []byte(""), merry.New("Couldn't find key").WithValue("keyring id", decoded.KeyId.String())
 	}
 
 	return key.DecryptEncryptedItem(decoded)
@@ -76,8 +76,8 @@ func (kr *YAMLKeyring) AddKey(key *keysvc.Key) error {
 
 	if idExists || aliasExists {
 		return merry.New("Couldn't add key because it clashes with an existing key alias or id").
-			WithValue("keyid", key.Id.String()).
-			WithValue("alias", key.Alias)
+			WithValue("keyring id", key.Id.String()).
+			WithValue("keyring alias", key.Alias)
 	}
 
 	kr.Keys = append(kr.Keys, key)

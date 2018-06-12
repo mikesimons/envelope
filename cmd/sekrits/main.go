@@ -22,6 +22,10 @@ func main() {
 			Usage:  "Keyring file / url",
 			EnvVar: "SEKRITS_KEYRING",
 		},
+		cli.BoolFlag{
+			Name:  "debug",
+			Usage: "Enable debug",
+		},
 	}
 
 	app.Commands = []cli.Command{
@@ -30,7 +34,11 @@ func main() {
 		decryptCommand(),
 	}
 
-	merry.SetStackCaptureEnabled(COLLECT_DEBUG)
+	app.Before = func(c *cli.Context) error {
+		COLLECT_DEBUG = c.Bool("debug")
+		merry.SetStackCaptureEnabled(c.Bool("debug"))
+		return nil
+	}
 
 	app.Run(os.Args)
 }

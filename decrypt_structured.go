@@ -3,30 +3,30 @@ package sekrits
 import (
 	"bytes"
 	"encoding/base64"
-	"fmt"
-	errors "github.com/hashicorp/errwrap"
-	"github.com/mikesimons/traverser"
 	"io"
 	"io/ioutil"
 	"reflect"
 	"strings"
+
+	"github.com/ansel1/merry"
+	"github.com/mikesimons/traverser"
 )
 
 func (s *Sekrits) DecryptStructured(input io.Reader, format string) ([]byte, error) {
 	codec, err := codecForFormat(format)
 	if err != nil {
-		return []byte(""), err
+		return []byte(""), merry.Wrap(err).WithUserMessage("unrecognized format").WithValue("format", format)
 	}
 
 	var inputData interface{}
 	inputBytes, err := ioutil.ReadAll(input)
 	if err != nil {
-		return []byte(""), fmt.Errorf("error reading %s input: %s", format, err.Error())
+		return []byte(""), err
 	}
 
 	err = codec.Unmarshal(inputBytes, &inputData)
 	if err != nil {
-		return []byte(""), errors.Wrapf(fmt.Sprintf("error parsing %s", format), err)
+		return []byte(""), merry.Wrap(err).WithUserMessage("could not decode input").WithValue("format", format)
 	}
 
 	t := &traverser.Traverser{
@@ -52,12 +52,12 @@ func (s *Sekrits) DecryptStructured(input io.Reader, format string) ([]byte, err
 	err = t.Traverse(reflect.ValueOf(inputData))
 
 	if err != nil {
-		return []byte(""), errors.Wrapf("error decrypting value", err)
+		return []byte(""), err
 	}
 
 	decrypted, err := codec.Marshal(&inputData)
 	if err != nil {
-		return []byte(""), errors.Wrapf(fmt.Sprintf("error marshalling decrypted %s for output", format), err)
+		return []byte(""), merry.Wrap(err).WithUserMessage("error marshalling output")
 	}
 
 	return decrypted, nil

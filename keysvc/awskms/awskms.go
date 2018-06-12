@@ -30,9 +30,7 @@ func (dkp *AWSKMSService) DecryptDatakey(ciphertext *[]byte, plaintext *[]byte, 
 	result, err := dkp.client.Decrypt(input)
 
 	if err != nil {
-		return merry.Wrap(err).
-			WithUserMessage("Could not decrypt AWS KMS data key").
-			WithValue("decryption error", err)
+		return merry.Wrap(err).WithUserMessage("Could not decrypt AWS KMS data key")
 	}
 
 	ret := make([]byte, len(result.Plaintext))
