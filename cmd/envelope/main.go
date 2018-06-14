@@ -12,7 +12,7 @@ var COLLECT_DEBUG = true
 func main() {
 	app := cli.NewApp()
 	app.Name = "envelope"
-	app.Usage = "Secrets encryption that doesn't suck"
+	app.Usage = "Envelope secrets encryption"
 	app.Version = "0.0.1"
 
 	app.Flags = []cli.Flag{
