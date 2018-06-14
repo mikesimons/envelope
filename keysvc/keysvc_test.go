@@ -1,8 +1,8 @@
 package keysvc_test
 
 import (
-	"github.com/mikesimons/sekrits/keysvc"
-	"github.com/mikesimons/sekrits/keysvc/awskms"
+	"github.com/mikesimons/envelope/keysvc"
+	"github.com/mikesimons/envelope/keysvc/awskms"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

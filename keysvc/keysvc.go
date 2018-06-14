@@ -5,7 +5,7 @@ import (
 	"net/url"
 
 	"github.com/ansel1/merry"
-	"github.com/mikesimons/sekrits/keysvc/awskms"
+	"github.com/mikesimons/envelope/keysvc/awskms"
 	"gopkg.in/mgo.v2/bson"
 )
 

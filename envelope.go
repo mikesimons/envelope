@@ -1,25 +1,25 @@
-package sekrits
+package envelope
 
 import (
-	"github.com/mikesimons/sekrits/keyring"
+	"github.com/mikesimons/envelope/keyring"
 	"github.com/mikesimons/traverser"
 )
 
-type Sekrits struct {
+type Envelope struct {
 	Keyring                  keyring.Keyring
 	Prefix                   string
 	StructuredErrorBehaviour func(error) (traverser.Op, error)
 }
 
-func WithYamlKeyring(path string) (*Sekrits, error) {
+func WithYamlKeyring(path string) (*Envelope, error) {
 	kr, err := keyring.Load(path)
 	if err != nil {
-		return &Sekrits{}, err
+		return &Envelope{}, err
 	}
 
-	return &Sekrits{
+	return &Envelope{
 		Keyring: kr,
-		Prefix:  "!!sekrit:",
+		Prefix:  "!!enveloped:",
 		StructuredErrorBehaviour: func(e error) (traverser.Op, error) { return traverser.Noop() },
 	}, nil
 }

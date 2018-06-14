@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/ansel1/merry"
-	"github.com/mikesimons/sekrits/keysvc"
+	"github.com/mikesimons/envelope/keysvc"
 	"github.com/satori/go.uuid"
 	"github.com/spf13/afero"
 	"gopkg.in/yaml.v2"

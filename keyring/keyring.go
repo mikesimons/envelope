@@ -1,7 +1,7 @@
 package keyring
 
 import (
-	"github.com/mikesimons/sekrits/keysvc"
+	"github.com/mikesimons/envelope/keysvc"
 	"github.com/spf13/afero"
 )
 

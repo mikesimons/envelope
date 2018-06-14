@@ -11,7 +11,7 @@ var COLLECT_DEBUG = true
 
 func main() {
 	app := cli.NewApp()
-	app.Name = "sekrits"
+	app.Name = "envelope"
 	app.Usage = "Secrets encryption that doesn't suck"
 	app.Version = "0.0.1"
 
@@ -20,7 +20,7 @@ func main() {
 			Name:   "keyring",
 			Value:  "keyring.yaml",
 			Usage:  "Keyring file / url",
-			EnvVar: "SEKRITS_KEYRING",
+			EnvVar: "ENVELOPE_KEYRING",
 		},
 		cli.BoolFlag{
 			Name:  "debug",

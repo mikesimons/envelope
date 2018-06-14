@@ -8,7 +8,7 @@ import (
 
 	"log"
 
-	"github.com/mikesimons/sekrits"
+	"github.com/mikesimons/envelope"
 	"github.com/mikesimons/traverser"
 	"gopkg.in/urfave/cli.v1"
 )
@@ -54,7 +54,7 @@ func decryptCommand() cli.Command {
 				return processErrors(err)
 			}
 
-			app, err := sekrits.WithYamlKeyring(keyring)
+			app, err := envelope.WithYamlKeyring(keyring)
 			if err != nil {
 				return processErrors(err)
 			}

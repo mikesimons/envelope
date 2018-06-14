@@ -1,11 +1,11 @@
-package sekrits
+package envelope
 
 import (
 	"io"
 	"io/ioutil"
 )
 
-func (s *Sekrits) Decrypt(input io.Reader) ([]byte, error) {
+func (s *Envelope) Decrypt(input io.Reader) ([]byte, error) {
 	inputBytes, err := ioutil.ReadAll(input)
 	if err != nil {
 		return []byte(""), err

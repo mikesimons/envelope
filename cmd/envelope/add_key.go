@@ -5,12 +5,12 @@ import (
 	"net/url"
 
 	errors "github.com/hashicorp/errwrap"
-	"github.com/mikesimons/sekrits"
+	"github.com/mikesimons/envelope"
 	"gopkg.in/urfave/cli.v1"
 )
 
 // addKeyCommand implements the add-key command
-// e.g $ sekrits add-key test kms://arn
+// e.g $ envelope add-key test kms://arn
 func addKeyCommand() cli.Command {
 	return cli.Command{
 		Name:      "add-key",
@@ -37,7 +37,7 @@ func addKeyCommand() cli.Command {
 				return processErrors(err)
 			}
 
-			app, err := sekrits.WithYamlKeyring(keyring)
+			app, err := envelope.WithYamlKeyring(keyring)
 			if err != nil {
 				return processErrors(err)
 			}

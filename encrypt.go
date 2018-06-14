@@ -1,4 +1,4 @@
-package sekrits
+package envelope
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 )
 
-func (s *Sekrits) Encrypt(alias string, input io.Reader) ([]byte, error) {
+func (s *Envelope) Encrypt(alias string, input io.Reader) ([]byte, error) {
 	key, ok := s.Keyring.GetKey(alias)
 	if !ok {
 		return []byte(""), fmt.Errorf("Couldn't find key with alias or id '%s'", alias)

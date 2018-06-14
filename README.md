@@ -1,11 +1,11 @@
-# Sekrits
+# Envelope
 
-Sekrits is a simple envelope encryption tool designed to help any project keep their secrets in version control cheaply and securely.
+Envelope is a simple envelope encryption tool designed to help any project keep their secrets in version control cheaply and securely.
 
 The premise is very simple; we use AWS KMS to encrypt keys that we store in a keyring file.
 Since everything in the keyring file is encrypted it is safe to commit to version control.
 
-The keys in the keyring can be used to encrypt / decrypt your secrets using the sekrits tool and these can be kept next to the keyring.
+The keys in the keyring can be used to encrypt / decrypt your secrets using the envelope tool and these can be kept next to the keyring.
 All you will need to decrypt is sufficient IAM permissions, the keyring file and the secrets file(s).
 
 Features:

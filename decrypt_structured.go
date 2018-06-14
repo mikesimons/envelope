@@ -1,4 +1,4 @@
-package sekrits
+package envelope
 
 import (
 	"bytes"
@@ -12,7 +12,7 @@ import (
 	"github.com/mikesimons/traverser"
 )
 
-func (s *Sekrits) DecryptStructured(input io.Reader, format string) ([]byte, error) {
+func (s *Envelope) DecryptStructured(input io.Reader, format string) ([]byte, error) {
 	codec, err := codecForFormat(format)
 	if err != nil {
 		return []byte(""), merry.Wrap(err).WithUserMessage("unrecognized format").WithValue("format", format)

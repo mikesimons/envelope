@@ -1,4 +1,4 @@
-package sekrits
+package envelope
 
 import (
 	"encoding/json"

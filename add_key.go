@@ -1,10 +1,10 @@
-package sekrits
+package envelope
 
 import (
-	"github.com/mikesimons/sekrits/keysvc"
+	"github.com/mikesimons/envelope/keysvc"
 )
 
-func (s *Sekrits) AddKey(alias string, masterKey string, context map[string]string) (string, error) {
+func (s *Envelope) AddKey(alias string, masterKey string, context map[string]string) (string, error) {
 	key, err := keysvc.GenerateDatakey(alias, masterKey, context)
 	if err != nil {
 		return "", err

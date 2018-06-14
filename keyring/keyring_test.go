@@ -1,7 +1,7 @@
 package keyring_test
 
 import (
-	"github.com/mikesimons/sekrits/keyring"
+	"github.com/mikesimons/envelope/keyring"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

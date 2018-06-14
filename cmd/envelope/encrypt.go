@@ -5,7 +5,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/mikesimons/sekrits"
+	"github.com/mikesimons/envelope"
 	"gopkg.in/urfave/cli.v1"
 )
 
@@ -47,7 +47,7 @@ func encryptCommand() cli.Command {
 				inputReader = NewTrimReader(inputReader)
 			}
 
-			app, err := sekrits.WithYamlKeyring(keyring)
+			app, err := envelope.WithYamlKeyring(keyring)
 			if err != nil {
 				return processErrors(err)
 			}
