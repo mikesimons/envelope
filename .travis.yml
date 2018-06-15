@@ -1,6 +1,6 @@
 language: go
 go:
-- 1.1
+- "1.10"
 deploy:
   provider: releases
   api_key: "$GITHUB_AUTH"
