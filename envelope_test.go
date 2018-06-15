@@ -22,7 +22,6 @@ func TestEnvelope(t *testing.T) {
 }
 
 var testKeyId = os.Getenv("ENVELOPE_KMS_TEST_KEY_ID")
-var testKeyAlias = os.Getenv("ENVELOPE_KMS_TEST_KEY_ALIAS")
 
 var _ = Describe("Envelope", func() {
 	Describe("AddKey", func() {
