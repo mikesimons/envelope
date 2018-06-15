@@ -15,7 +15,7 @@ import (
 // NewKey builds a new key with the given alias / encrypted data key
 func NewKey(alias string, keyType string, ciphertext []byte, context map[string]string) *Key {
 	return &Key{
-		Id:         uuid.NewV4(),
+		ID:         uuid.NewV4(),
 		Alias:      alias,
 		Ciphertext: ciphertext,
 		Type:       keyType,
@@ -32,7 +32,7 @@ func (key *Key) decryptDatakey() error {
 	err = keysvc.DecryptDatakey(&key.Ciphertext, &key.Plaintext, key.Context)
 	if err != nil {
 		return merry.Wrap(err).
-			WithValue("keyring id", key.Id.String()).
+			WithValue("keyring id", key.ID.String()).
 			WithValue("keyring alias", key.Alias)
 	}
 
@@ -49,7 +49,7 @@ func (key *Key) EncryptBytes(data []byte) ([]byte, error) {
 	rand.Read(nonce[:])
 
 	ret := &encryptedData{
-		KeyId: key.Id,
+		KeyID: key.ID,
 	}
 
 	var plaintext [32]byte
@@ -87,7 +87,7 @@ func (key *Key) DecryptEncryptedItem(encrypted encryptedData) ([]byte, error) {
 
 func (key *Key) MarshalYAML() (interface{}, error) {
 	out := make(map[string]interface{})
-	out["id"] = key.Id.String()
+	out["id"] = key.ID.String()
 	out["alias"] = key.Alias
 	out["key"] = base64.StdEncoding.EncodeToString(key.Ciphertext)
 	out["type"] = key.Type
@@ -97,7 +97,7 @@ func (key *Key) MarshalYAML() (interface{}, error) {
 
 func (key *Key) UnmarshalYAML(unmarshal func(v interface{}) error) error {
 	var custom struct {
-		Id      uuid.UUID
+		ID      uuid.UUID
 		Alias   string
 		Key     string
 		Type    string
@@ -108,11 +108,11 @@ func (key *Key) UnmarshalYAML(unmarshal func(v interface{}) error) error {
 		return err
 	}
 
-	key.Id = custom.Id
+	key.ID = custom.ID
 	key.Alias = custom.Alias
 	key.Type = custom.Type
 	key.Context = custom.Context
-	decoded, err := base64.StdEncoding.DecodeString(string(custom.Key))
+	decoded, err := base64.StdEncoding.DecodeString(custom.Key)
 	if err != nil {
 		return err
 	}

@@ -16,5 +16,5 @@ func (s *Envelope) AddKey(alias string, masterKey string, context map[string]str
 		return "", err
 	}
 
-	return key.Id.String(), nil
+	return key.ID.String(), nil
 }

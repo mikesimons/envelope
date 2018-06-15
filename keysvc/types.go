@@ -5,7 +5,7 @@ import (
 )
 
 type encryptedData struct {
-	KeyId      uuid.UUID
+	KeyID      uuid.UUID
 	Ciphertext []byte
 }
 
@@ -15,7 +15,7 @@ type KeyServiceProvider interface {
 }
 
 type Key struct {
-	Id         uuid.UUID
+	ID         uuid.UUID
 	Alias      string
 	Ciphertext []byte
 	Plaintext  []byte

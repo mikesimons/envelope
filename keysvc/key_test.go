@@ -38,7 +38,7 @@ var _ = Describe("Key", func() {
 			key := NewKey("alias", "test", []byte("ciphertext"), nil)
 			Expect(key.Alias).To(Equal("alias"))
 			Expect(key.Ciphertext).To(Equal([]byte("ciphertext")))
-			Expect(key.Id).NotTo(BeAssignableToTypeOf(&uuid.UUID{}))
+			Expect(key.ID).NotTo(BeAssignableToTypeOf(&uuid.UUID{}))
 		})
 	})
 
@@ -66,7 +66,7 @@ var _ = Describe("Key", func() {
 				}
 
 				key := &Key{
-					Id:         uuid.NewV4(),
+					ID:         uuid.NewV4(),
 					Alias:      "alias",
 					Ciphertext: []byte("test"),
 					Context:    context,
@@ -80,7 +80,7 @@ var _ = Describe("Key", func() {
 				err = yaml.Unmarshal(marshalled, &verify)
 
 				Expect(err).To(BeNil())
-				Expect(verify["id"]).To(Equal(key.Id.String()))
+				Expect(verify["id"]).To(Equal(key.ID.String()))
 				Expect(verify["alias"]).To(Equal("alias"))
 				Expect(verify["key"]).To(Equal("dGVzdA==")) // Base64 encoded "test"
 
@@ -98,7 +98,7 @@ var _ = Describe("Key", func() {
 				}
 
 				inputKey := &Key{
-					Id:         uuid.NewV4(),
+					ID:         uuid.NewV4(),
 					Alias:      "alias",
 					Ciphertext: []byte("test"),
 					Context:    context,

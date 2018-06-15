@@ -21,16 +21,16 @@ func TestEnvelope(t *testing.T) {
 	RunSpecs(t, "Envelope Suite")
 }
 
-var testKeyId = os.Getenv("ENVELOPE_KMS_TEST_KEY_ID")
+var testKeyID = os.Getenv("ENVELOPE_KMS_TEST_KEY_ID")
 
 var _ = Describe("Envelope", func() {
 	Describe("AddKey", func() {
 		It("should add a key to the keyring", func() {
 			keyring.Fs = afero.NewMemMapFs()
 			app, _ := envelope.WithYamlKeyring("test.yaml")
-			keyId, err := app.AddKey("alias", fmt.Sprintf("awskms://%s", testKeyId), nil)
+			keyID, err := app.AddKey("alias", fmt.Sprintf("awskms://%s", testKeyID), nil)
 
-			Expect(keyId).ToNot(BeEmpty())
+			Expect(keyID).ToNot(BeEmpty())
 			Expect(err).To(BeNil())
 
 			file, _ := afero.ReadFile(keyring.Fs, "test.yaml")
@@ -45,13 +45,13 @@ var _ = Describe("Envelope", func() {
 			keyring.Fs = afero.NewMemMapFs()
 			app, _ := envelope.WithYamlKeyring("test.yaml")
 
-			keyId, err := app.AddKey("alias", fmt.Sprintf("awskms://%s", testKeyId), nil)
+			keyID, err := app.AddKey("alias", fmt.Sprintf("awskms://%s", testKeyID), nil)
 			Expect(err).To(BeNil())
 
-			_, err = app.AddKey("alias", fmt.Sprintf("awskms://%s", testKeyId), nil)
+			_, err = app.AddKey("alias", fmt.Sprintf("awskms://%s", testKeyID), nil)
 			Expect(err).ToNot(BeNil())
 
-			_, err = app.AddKey(keyId, fmt.Sprintf("awskms://%s", testKeyId), nil)
+			_, err = app.AddKey(keyID, fmt.Sprintf("awskms://%s", testKeyID), nil)
 			Expect(err).ToNot(BeNil())
 		})
 
@@ -72,7 +72,7 @@ var _ = Describe("Envelope", func() {
 		It("should return an error if an invalid key service is provided", func() {
 			keyring.Fs = afero.NewMemMapFs()
 			app, _ := envelope.WithYamlKeyring("test.yaml")
-			_, err := app.AddKey("alias", fmt.Sprintf("kms://%s", testKeyId), nil)
+			_, err := app.AddKey("alias", fmt.Sprintf("kms://%s", testKeyID), nil)
 			Expect(err).ToNot(BeNil())
 		})
 
@@ -88,7 +88,7 @@ var _ = Describe("Envelope", func() {
 		It("should encrypt the given secret in a way that can be decrypted", func() {
 			keyring.Fs = afero.NewMemMapFs()
 			app, _ := envelope.WithYamlKeyring("test.yaml")
-			_, err := app.AddKey("alias", fmt.Sprintf("awskms://%s", testKeyId), nil)
+			_, err := app.AddKey("alias", fmt.Sprintf("awskms://%s", testKeyID), nil)
 			Expect(err).To(BeNil())
 
 			encrypted, err := app.Encrypt("alias", bytes.NewReader([]byte("teststring")))

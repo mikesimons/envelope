@@ -42,12 +42,12 @@ func addKeyCommand() cli.Command {
 				return processErrors(err)
 			}
 
-			keyId, err := app.AddKey(alias, providerDsn, context)
+			keyID, err := app.AddKey(alias, providerDsn, context)
 			if err != nil {
 				return processErrors(err)
 			}
 
-			fmt.Printf("Added key %s (%s)", keyId, alias)
+			fmt.Printf("Added key %s (%s)", keyID, alias)
 
 			return nil
 		},

@@ -56,9 +56,9 @@ func (kr *YAMLKeyring) Decrypt(data []byte) ([]byte, error) {
 		return []byte(""), err
 	}
 
-	key, ok := kr.GetKey(decoded.KeyId.String())
+	key, ok := kr.GetKey(decoded.KeyID.String())
 	if !ok {
-		return []byte(""), merry.New("Couldn't find key").WithValue("keyring id", decoded.KeyId.String())
+		return []byte(""), merry.New("Couldn't find key").WithValue("keyring id", decoded.KeyID.String())
 	}
 
 	return key.DecryptEncryptedItem(decoded)
@@ -71,12 +71,12 @@ func (kr *YAMLKeyring) GetKeys() []*keysvc.Key {
 
 // AddKey adds a predefined key to the keyring
 func (kr *YAMLKeyring) AddKey(key *keysvc.Key) error {
-	_, idExists := kr.GetKey(key.Id.String())
+	_, idExists := kr.GetKey(key.ID.String())
 	_, aliasExists := kr.GetKey(key.Alias)
 
 	if idExists || aliasExists {
 		return merry.New("Couldn't add key because it clashes with an existing key alias or id").
-			WithValue("keyring id", key.Id.String()).
+			WithValue("keyring id", key.ID.String()).
 			WithValue("keyring alias", key.Alias)
 	}
 
@@ -96,10 +96,10 @@ func (kr *YAMLKeyring) AddKey(key *keysvc.Key) error {
 }
 
 // GetKey gets an individual key from the keyring
-func (kr *YAMLKeyring) GetKey(aliasOrId string) (*keysvc.Key, bool) {
-	id := uuid.FromStringOrNil(aliasOrId)
+func (kr *YAMLKeyring) GetKey(aliasOrID string) (*keysvc.Key, bool) {
+	id := uuid.FromStringOrNil(aliasOrID)
 	for _, k := range kr.Keys {
-		if (id != uuid.UUID{} && k.Id == id) || k.Alias == aliasOrId {
+		if (id != uuid.UUID{} && k.ID == id) || k.Alias == aliasOrID {
 			return k, true
 		}
 	}
