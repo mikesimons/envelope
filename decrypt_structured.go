@@ -12,6 +12,7 @@ import (
 	"github.com/mikesimons/traverser"
 )
 
+// DecryptStructured will parse the input as format and use the encryption prefix to automatically identify and decrypt encrypted values
 func (s *Envelope) DecryptStructured(input io.Reader, format string) ([]byte, error) {
 	codec, err := codecForFormat(format)
 	if err != nil {

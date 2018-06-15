@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 )
 
+// Encrypt will encypt the input as a blob using the key from the keyring with the given alias
 func (s *Envelope) Encrypt(alias string, input io.Reader) ([]byte, error) {
 	key, ok := s.Keyring.GetKey(alias)
 	if !ok {
