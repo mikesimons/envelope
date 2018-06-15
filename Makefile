@@ -16,6 +16,8 @@ cmd/envelope/envelope-$(version)-windows-amd64:
 dev-deps:
 	go get github.com/Masterminds/glide
 	go get github.com/alecthomas/gometalinter
+	go get github.com/onsi/ginkgo/ginkgo
+	go get github.com/onsi/gomega/...
 
 test:
 	ginkgo ./...
