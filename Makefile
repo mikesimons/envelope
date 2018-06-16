@@ -1,17 +1,24 @@
-version=$(shell git describe --all | sed -e's/.*\///g')
+repo=github.com/mikesimons/envelope
+version=$(shell git describe --all --dirty --long | awk -F"-|/" '/^heads/ {print $$2 "@" substr($$4, 2) "!" $$5}; /^tags/ { print $$2 }')
+build_args=-ldflags "-X main.envelope_version_string=$(version)" $(repo)/cmd/envelope
 
 .PHONY: test dev-deps
 
-all: test cmd/envelope/envelope-$(version)-linux-amd64 cmd/envelope/envelope-$(version)-darwin-amd64 cmd/envelope/envelope-$(version)-windows-amd64
+all: test build
 
-cmd/envelope/envelope-$(version)-linux-amd64:
-	GOARCH=amd64 GOOS=linux cd cmd/envelope && go build -o $@
+build: build-linux build-darwin build-windows 
 
-cmd/envelope/envelope-$(version)-darwin-amd64:
-	GOARCH=amd64 GOOS=darwin cd cmd/envelope && go build -o $@
+build-linux: build/envelope-$(version)-linux-amd64
+build/envelope-$(version)-linux-amd64:
+	GOARCH=amd64 GOOS=linux go build -o $@ $(build_args)
 
-cmd/envelope/envelope-$(version)-windows-amd64:
-	GOARCH=amd64 GOOS=windows cd cmd/envelope && go build -o $@
+build-darwin: build/envelope-$(version)-darwin-amd64
+build/envelope-$(version)-darwin-amd64:
+	GOARCH=amd64 GOOS=darwin go build -o $@ $(build_args)
+
+build-windows: build/envelope-$(version)-windows-amd64
+build/envelope-$(version)-windows-amd64:
+	GOARCH=amd64 GOOS=windows go build -o $@ $(build_args)
 
 dev-deps:
 	go get github.com/Masterminds/glide

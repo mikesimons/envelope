@@ -8,12 +8,13 @@ import (
 )
 
 var COLLECT_DEBUG = true
+var envelope_version_string = "dev"
 
 func main() {
 	app := cli.NewApp()
 	app.Name = "envelope"
 	app.Usage = "Envelope secrets encryption"
-	app.Version = "0.0.1"
+	app.Version = envelope_version_string
 
 	app.Flags = []cli.Flag{
 		cli.StringFlag{

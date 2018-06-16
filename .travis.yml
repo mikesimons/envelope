@@ -4,10 +4,8 @@ go:
 deploy:
   provider: releases
   api_key: "$GITHUB_AUTH"
-  file:
-  - cmd/envelope/envelope-${TRAVIS_TAG}-linux-amd64
-  - cmd/envelope/envelope-${TRAVIS_TAG}-darwin-amd64
-  - cmd/envelope/envelope-${TRAVIS_TAG}-windows-amd64
+  file_glob: true
+  file: "build/envelope-*"
   skip_cleanup: true
   on:
     tags: true

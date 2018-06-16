@@ -1,5 +1,6 @@
 cmd/envelope/envelope
 cmd/envelope/keyring.yaml
 cmd/envelope/test.*
+build/*
 .envrc
 vendor
