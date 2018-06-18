@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/ansel1/merry"
+	cli "gopkg.in/urfave/cli.v1"
 )
 
 func asFormat(as string, input string) string {
@@ -66,7 +67,7 @@ func processErrors(err error) error {
 	}
 	lines = append(lines, strings.Join(extra, ", "))
 
-	return fmt.Errorf(strings.Join(lines, "\n"))
+	return cli.NewExitError(strings.Join(lines, "\n"), 1)
 }
 
 func getInputReader(input string) (io.Reader, error) {

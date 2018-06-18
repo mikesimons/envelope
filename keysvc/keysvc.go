@@ -3,6 +3,7 @@ package keysvc
 import (
 	"fmt"
 	"net/url"
+	"strings"
 
 	"github.com/ansel1/merry"
 	"github.com/mikesimons/envelope/keysvc/awskms"
@@ -26,7 +27,11 @@ func GetKeyService(name string) (KeyServiceProvider, error) {
 		return fn()
 	}
 
-	return nil, fmt.Errorf("Unknown key service: %s", name)
+	var known []string
+	for k := range services {
+		known = append(known, k)
+	}
+	return nil, merry.Errorf("Unknown key service. Must be one of: %s", strings.Join(known, ", ")).WithValue("svc", name)
 }
 
 func GenerateDatakey(alias string, masterKey string, context map[string]string) (*Key, error) {
