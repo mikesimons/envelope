@@ -2,6 +2,44 @@
 
 Envelope is a simple envelope encryption tool designed to help any project keep their secrets in version control cheaply and securely.
 
+## Installing
+Grab an appropriate binary from the releases page or if you're on OSX `brew install mikesimons/brew/envelope`
+
+## TLDR
+In AWS go to `IAM -> Encryption keys` (bottom of left menu) and create a KMS key. Grab the full ARN of the key and use it in the place of `<KMSARN>` below. `--context` is optional but recommended to enable fine grained permissions:
+```
+envelope addkey --context="env=production" production awskms://<KMSARN>
+```
+This will create a file called `keyring.yaml` that you need to keep in version control.
+
+```
+jq '.some.secret' secrets.json | envelope encrypt --key=production
+```
+The encrypted secret will be printed. At the time of writing it's not possible to encrypt in-place so you'll need to replace the value of `.some.secret` in `secrets.json`.
+
+Once you've done that you can decrypt with:
+```
+envelope decrypt secrets.json
+```
+
+Using the context provided when you add the key to the envelope keyring you can grant fine grained permissions using IAM. For example, the following policy will allow the given role to encrypt secrets for production but not decrypt them:
+```json
+{
+  "Effect": "Allow",
+  "Principal": {
+    "AWS": "arn:aws:iam::111122223333:role/MyRole"
+  },
+  "Action": "kms:Encrypt",
+  "Resource": "*",
+  "Condition": {
+    "StringEquals": {
+      "kms:EncryptionContext:env": "production"
+    }
+  }
+}
+```
+
+## How it works
 The premise is very simple; we use AWS KMS to encrypt keys that we store in a keyring file.
 Since everything in the keyring file is encrypted it is safe to commit to version control.
 
