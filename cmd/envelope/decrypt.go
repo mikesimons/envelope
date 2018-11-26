@@ -20,7 +20,7 @@ func decryptCommand() cli.Command {
 		Flags: []cli.Flag{
 			cli.StringFlag{
 				Name:  "format",
-				Usage: "Type of data to encrypt (blob | yaml | json | toml)",
+				Usage: "Type of data to decrypt (blob | yaml | json | toml)",
 			},
 			cli.BoolFlag{
 				Name:  "unset-errors",
