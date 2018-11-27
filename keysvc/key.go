@@ -4,7 +4,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	//errors "github.com/hashicorp/errwrap"
-	"math/rand"
+	"crypto/rand"
 
 	"github.com/ansel1/merry"
 	"github.com/satori/go.uuid"
