@@ -11,23 +11,23 @@ func awsErrorString(err error) string {
 	if aerr, ok := err.(awserr.Error); ok {
 		switch aerr.Code() {
 		case kms.ErrCodeNotFoundException:
-			return fmt.Sprintf(kms.ErrCodeNotFoundException, aerr.Error())
+			return fmt.Sprint(kms.ErrCodeNotFoundException, aerr.Error())
 		case kms.ErrCodeDisabledException:
-			return fmt.Sprintf(kms.ErrCodeDisabledException, aerr.Error())
+			return fmt.Sprint(kms.ErrCodeDisabledException, aerr.Error())
 		case kms.ErrCodeKeyUnavailableException:
-			return fmt.Sprintf(kms.ErrCodeKeyUnavailableException, aerr.Error())
+			return fmt.Sprint(kms.ErrCodeKeyUnavailableException, aerr.Error())
 		case kms.ErrCodeDependencyTimeoutException:
-			return fmt.Sprintf(kms.ErrCodeDependencyTimeoutException, aerr.Error())
+			return fmt.Sprint(kms.ErrCodeDependencyTimeoutException, aerr.Error())
 		case kms.ErrCodeInvalidKeyUsageException:
-			return fmt.Sprintf(kms.ErrCodeInvalidKeyUsageException, aerr.Error())
+			return fmt.Sprint(kms.ErrCodeInvalidKeyUsageException, aerr.Error())
 		case kms.ErrCodeInvalidGrantTokenException:
-			return fmt.Sprintf(kms.ErrCodeInvalidGrantTokenException, aerr.Error())
+			return fmt.Sprint(kms.ErrCodeInvalidGrantTokenException, aerr.Error())
 		case kms.ErrCodeInternalException:
-			return fmt.Sprintf(kms.ErrCodeInternalException, aerr.Error())
+			return fmt.Sprint(kms.ErrCodeInternalException, aerr.Error())
 		case kms.ErrCodeInvalidStateException:
-			return fmt.Sprintf(kms.ErrCodeInvalidStateException, aerr.Error())
+			return fmt.Sprint(kms.ErrCodeInvalidStateException, aerr.Error())
 		default:
-			return fmt.Sprintf(aerr.Error())
+			return fmt.Sprint(aerr.Error())
 		}
 	}
 
