@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"reflect"
+	"strings"
 
 	"log"
 
@@ -22,18 +23,10 @@ func decryptCommand() cli.Command {
 				Name:  "format",
 				Usage: "Type of data to decrypt (blob | yaml | json | toml)",
 			},
-			cli.BoolFlag{
-				Name:  "unset-errors",
-				Usage: "Unset keys if they can't be decrypted (only applies to structured decryption)",
-			},
 			cli.StringFlag{
-				Name:  "default-error-value",
-				Usage: "Set keys to this value if they can't be decrypted (only applies to structured decryption)",
-				Value: "ERROR",
-			},
-			cli.BoolFlag{
-				Name:  "ignore-errors",
-				Usage: "Ignore decryption errors and leave the encrypted string in place (only applies to structured decryption)",
+				Name:  "on-error",
+				Usage: "Method for handling decryption errors (unset | replace:<value> | ignore | exit)",
+				Value: "exit",
 			},
 		},
 		Action: func(c *cli.Context) error {
@@ -66,7 +59,11 @@ func decryptCommand() cli.Command {
 			case "blob":
 				decrypted, err = app.Decrypt(base64.NewDecoder(base64.StdEncoding, inputReader))
 			default:
-				app.StructuredErrorBehaviour = structuredErrorHandler(c)
+				handler, err := structuredErrorHandler(c.String("on-error"))
+				if err != nil {
+					return processErrors(err)
+				}
+				app.StructuredErrorBehaviour = handler
 				decrypted, err = app.DecryptStructured(inputReader, as)
 			}
 
@@ -82,23 +79,40 @@ func decryptCommand() cli.Command {
 	}
 }
 
-func structuredErrorHandler(c *cli.Context) func(error) (traverser.Op, error) {
-	if c.Bool("ignore-errors") {
-		return func(e error) (traverser.Op, error) {
-			log.Print(e)
-			return traverser.Noop()
-		}
-	}
+func structuredErrorHandler(strategy string) (func(error) (traverser.Op, error), error) {
+	values := strings.SplitN(strategy, ":", 2)
 
-	if c.Bool("unset-errors") {
+	switch values[0] {
+	case "unset":
 		return func(e error) (traverser.Op, error) {
-			log.Print(e)
+			// todo debug log e
 			return traverser.Unset()
+		}, nil
+
+	case "replace":
+		replace := values[0]
+		if replace == "" {
+			replace = "ERROR"
 		}
+
+		return func(e error) (traverser.Op, error) {
+			// todo debug log e
+			return traverser.Set(reflect.ValueOf(replace))
+		}, nil
+
+	case "ignore":
+		return func(e error) (traverser.Op, error) {
+			// todo debug log e
+			return traverser.Noop()
+		}, nil
+
+	case "exit":
+		return func(e error) (traverser.Op, error) {
+			// todo debug log e
+			log.Print(e)
+			return traverser.ErrorNoop(e)
+		}, nil
 	}
 
-	return func(e error) (traverser.Op, error) {
-		log.Print(e)
-		return traverser.Set(reflect.ValueOf(c.String("default-error-value")))
-	}
+	return nil, fmt.Errorf("Invalid error handling stategy '%s'. Valid values: unset, replace:<value>, ignore, exit", strategy)
 }
