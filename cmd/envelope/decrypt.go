@@ -21,7 +21,7 @@ func decryptCommand() cli.Command {
 		Flags: []cli.Flag{
 			cli.StringFlag{
 				Name:  "format",
-				Usage: "Type of data to decrypt (blob | yaml | json | toml)",
+				Usage: "Type of input data (blob | yaml | json | toml)",
 			},
 			cli.StringFlag{
 				Name:  "on-error",
