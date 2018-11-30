@@ -3,6 +3,7 @@ package envelope
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/naoina/toml"
 	"gopkg.in/yaml.v2"
 )
@@ -21,7 +22,9 @@ func codecForFormat(format string) (structuredCodec, error) {
 		}, nil
 	case "json":
 		return structuredCodec{
-			Marshal:   json.Marshal,
+			Marshal: func(v interface{}) ([]byte, error) {
+				return json.MarshalIndent(v, "", "  ")
+			},
 			Unmarshal: json.Unmarshal,
 		}, nil
 	case "toml":
