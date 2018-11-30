@@ -16,18 +16,37 @@ import (
 func (s *Envelope) DecryptStructured(input io.Reader, format string) ([]byte, error) {
 	codec, err := codecForFormat(format)
 	if err != nil {
-		return []byte(""), merry.Wrap(err).WithUserMessage("unrecognized format").WithValue("format", format)
+		return nil, merry.Wrap(err).WithUserMessage("unrecognized format").WithValue("format", format)
+	}
+
+	inputData, err := s.DecryptStructuredAsMap(input, format)
+	if err != nil {
+		return nil, err
+	}
+
+	decrypted, err := codec.Marshal(&inputData)
+	if err != nil {
+		return []byte(""), merry.Wrap(err).WithUserMessage("error marshalling output")
+	}
+
+	return decrypted, nil
+}
+
+func (s *Envelope) DecryptStructuredAsMap(input io.Reader, format string) (interface{}, error) {
+	codec, err := codecForFormat(format)
+	if err != nil {
+		return nil, merry.Wrap(err).WithUserMessage("unrecognized format").WithValue("format", format)
 	}
 
 	var inputData interface{}
 	inputBytes, err := ioutil.ReadAll(input)
 	if err != nil {
-		return []byte(""), err
+		return nil, err
 	}
 
 	err = codec.Unmarshal(inputBytes, &inputData)
 	if err != nil {
-		return []byte(""), merry.Wrap(err).WithUserMessage("could not decode input").WithValue("format", format)
+		return nil, merry.Wrap(err).WithUserMessage("could not decode input").WithValue("format", format)
 	}
 
 	t := &traverser.Traverser{
@@ -53,13 +72,8 @@ func (s *Envelope) DecryptStructured(input io.Reader, format string) ([]byte, er
 	err = t.Traverse(reflect.ValueOf(inputData))
 
 	if err != nil {
-		return []byte(""), err
+		return nil, err
 	}
 
-	decrypted, err := codec.Marshal(&inputData)
-	if err != nil {
-		return []byte(""), merry.Wrap(err).WithUserMessage("error marshalling output")
-	}
-
-	return decrypted, nil
+	return inputData, nil
 }
