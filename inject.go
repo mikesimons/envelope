@@ -10,7 +10,7 @@ import (
 	"github.com/ansel1/merry"
 )
 
-func (s *Envelope) EncryptInPlace(input io.Reader, key string, value interface{}, format string) ([]byte, error) {
+func (s *Envelope) InjectEncrypted(alias string, input io.Reader, key string, value io.Reader, format string) ([]byte, error) {
 	codec, err := codecForFormat(format)
 	if err != nil {
 		return []byte(""), merry.Wrap(err).WithUserMessage("unrecognized format").WithValue("format", format)
@@ -27,8 +27,21 @@ func (s *Envelope) EncryptInPlace(input io.Reader, key string, value interface{}
 		return []byte(""), merry.Wrap(err).WithUserMessage("could not decode input").WithValue("format", format)
 	}
 
+	encrypted, err := s.EncryptWithOpts(
+		alias,
+		value,
+		EncryptOpts{
+			Encoder:    Base64Encoder,
+			WithPrefix: true,
+		},
+	)
+
+	if err != nil {
+		return []byte(""), err
+	}
+
 	splitKey := strings.Split(key, ".")
-	err = set(reflect.ValueOf(inputData), splitKey, []string{}, reflect.ValueOf(value))
+	err = set(reflect.ValueOf(inputData), splitKey, []string{}, reflect.ValueOf(string(encrypted)))
 	if err != nil {
 		return []byte(""), merry.Wrap(err).WithValue("key", key)
 	}
