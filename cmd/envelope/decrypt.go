@@ -30,14 +30,12 @@ func decryptCommand() cli.Command {
 			},
 		},
 		Action: func(c *cli.Context) error {
-			if c.NArg() != 1 {
-				cli.ShowCommandHelp(c, "decrypt")
-				fmt.Println("")
-				return cli.NewExitError("Error: Not enough arguments", 1)
-			}
-
 			keyring := c.GlobalString("keyring")
+
 			input := c.Args().Get(0)
+			if input == "" {
+				input = "-"
+			}
 
 			var err error
 			outputWriter := os.Stdout
