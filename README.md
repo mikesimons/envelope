@@ -1,5 +1,4 @@
-# Envelope
-
+# Envelope [![Build Status](https://travis-ci.org/mikesimons/envelope.svg?branch=master)](https://travis-ci.org/mikesimons/envelope)
 Envelope is a tool designed to help any project keep their secrets in version control cheaply and securely.
 
 ## How it works
