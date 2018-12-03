@@ -12,6 +12,7 @@ import:
   - service/kms/kmsiface
 - package: github.com/hashicorp/errwrap
 - package: github.com/mikesimons/traverser
+  version: ^0.1.0
 - package: github.com/naoina/toml
   version: ^0.1.1
 - package: github.com/satori/go.uuid

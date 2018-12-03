@@ -1,13 +1,12 @@
 package envelope
 
 import (
-	"fmt"
 	"io"
 	"io/ioutil"
-	"reflect"
 	"strings"
 
 	"github.com/ansel1/merry"
+	"github.com/mikesimons/traverser"
 )
 
 func (s *Envelope) InjectEncrypted(alias string, input io.Reader, key string, value io.Reader, format string) ([]byte, error) {
@@ -41,7 +40,7 @@ func (s *Envelope) InjectEncrypted(alias string, input io.Reader, key string, va
 	}
 
 	splitKey := strings.Split(key, ".")
-	err = set(reflect.ValueOf(inputData), splitKey, []string{}, reflect.ValueOf(string(encrypted)))
+	err = traverser.SetKey(inputData, splitKey, string(encrypted))
 	if err != nil {
 		return []byte(""), merry.Wrap(err).WithValue("key", key)
 	}
@@ -52,33 +51,4 @@ func (s *Envelope) InjectEncrypted(alias string, input io.Reader, key string, va
 	}
 
 	return ret, nil
-}
-
-func set(data reflect.Value, path []string, traversed []string, value reflect.Value) error {
-	nextKey := path[0]
-	nextPath := path[1:]
-	var zeroVal reflect.Value
-
-	switch data.Kind() {
-	case reflect.Interface:
-		return set(data.Elem(), path, traversed, value)
-	case reflect.Map:
-		nextKeyVal := reflect.ValueOf(nextKey)
-		nextVal := data.MapIndex(nextKeyVal)
-
-		if len(nextPath) == 0 {
-			data.SetMapIndex(nextKeyVal, value)
-			return nil
-		}
-
-		if nextVal == zeroVal {
-			nextVal = reflect.ValueOf(make(map[string]interface{}))
-			data.SetMapIndex(nextKeyVal, nextVal)
-		}
-
-		traversed = append(traversed, nextKey)
-		return set(nextVal, nextPath, traversed, value)
-	default:
-		return fmt.Errorf("Can't set key because %s is a %s", strings.Join(traversed, "."), data.Kind().String())
-	}
 }

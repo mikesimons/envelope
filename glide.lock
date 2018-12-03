@@ -1,10 +1,10 @@
-hash: 85b5e797755eccae237fa4f9417842ec843a8f5714d45d434cf4e44d9c7488a8
-updated: 2018-06-15T00:30:17.158818+02:00
+hash: 83455250e6234a9c27032c94d91b7d126bb878d91c37e7b82cde48e0df82e2c9
+updated: 2018-12-03T10:32:29.709193+01:00
 imports:
 - name: github.com/ansel1/merry
-  version: 00f3214d4c860c9511dcbd5d0098658a64d3848b
+  version: 5429a08c10ad44bc57a5dbbf49fd44a6371fb167
 - name: github.com/aws/aws-sdk-go
-  version: 92c96c4f5ad419f2a72401c2f606d51e010cc110
+  version: ceab7b7ac6f535d1397f124620720b5145f1ad59
   subpackages:
   - aws
   - aws/awserr
@@ -23,8 +23,10 @@ imports:
   - aws/request
   - aws/session
   - aws/signer/v4
+  - internal/ini
   - internal/sdkio
   - internal/sdkrand
+  - internal/sdkuri
   - internal/shareddefaults
   - private/protocol
   - private/protocol/json/jsonutil
@@ -36,14 +38,12 @@ imports:
   - service/kms
   - service/kms/kmsiface
   - service/sts
-- name: github.com/go-ini/ini
-  version: 06f5f3d67269ccec1fe5fe4134ba6e982984f7f5
 - name: github.com/hashicorp/errwrap
   version: 7554cd9344cec97297fa6649b055a8c98c2a1e55
 - name: github.com/jmespath/go-jmespath
   version: c2b33e8439af944379acbdd9c3a5fe0bc44bd8a5
 - name: github.com/mikesimons/traverser
-  version: 619d58ae4ceba4d2d02ba3a6a804b5898e9b3c44
+  version: 127c46119b5c1a3d85fed89381bdd1b900502d02
 - name: github.com/naoina/go-stringutil
   version: 6b638e95a32d0c1131db0e7fe83775cbea4a0d0b
 - name: github.com/naoina/toml
@@ -53,7 +53,7 @@ imports:
 - name: github.com/satori/go.uuid
   version: f58768cc1a7a7e77a3bd49e98cdd21419399b6a3
 - name: github.com/spf13/afero
-  version: 787d034dfe70e44075ccc060d346146ef53270ad
+  version: d40851caa0d747393da1ffb28f7f9d8b4eeffebd
   subpackages:
   - mem
 - name: golang.org/x/crypto
@@ -90,10 +90,17 @@ imports:
 - name: gopkg.in/urfave/cli.v1
   version: cfb38830724cc34fedffe9a2a29fb54fa9169cd1
 - name: gopkg.in/yaml.v2
-  version: 5420a8b6744d3b0345ab293f6fcba19c978f1183
+  version: 51d6538a90f86fe93ac480b35f37b2be17fef232
 testImports:
+- name: github.com/hpcloud/tail
+  version: a1dbeea552b7c8df4b542c66073e393de198a800
+  subpackages:
+  - ratelimiter
+  - util
+  - watch
+  - winfile
 - name: github.com/onsi/ginkgo
-  version: fa5fabab2a1bfbd924faf4c067d07ae414e2aedf
+  version: 2e1be8f7d90e9d3e3e58b0ce470f2f14d075406f
   subpackages:
   - config
   - internal/codelocation
@@ -113,7 +120,7 @@ testImports:
   - reporters/stenographer/support/go-isatty
   - types
 - name: github.com/onsi/gomega
-  version: 62bff4df71bdbc266561a0caee19f0594b17c240
+  version: 65fb64232476ad9046e57c26cd0bff3d3a8dc6cd
   subpackages:
   - format
   - internal/assertion
@@ -136,3 +143,7 @@ testImports:
   version: f6cff0780e542efa0c8e864dc8fa522808f6a598
   subpackages:
   - unix
+- name: gopkg.in/fsnotify/fsnotify.v1
+  version: c2828203cd70a50dcccfb2761f8b1f8ceef9a8e9
+- name: gopkg.in/tomb.v1
+  version: c131134a1947e9afd9cecfe11f4c6dff0732ae58

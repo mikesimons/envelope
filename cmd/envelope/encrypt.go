@@ -5,11 +5,10 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	"reflect"
 	"strings"
 
-	"github.com/ansel1/merry"
 	"github.com/mikesimons/envelope"
+	"github.com/mikesimons/traverser"
 	"gopkg.in/urfave/cli.v1"
 )
 
@@ -174,7 +173,7 @@ func getSecretReader(app *envelope.Envelope, file string, format string, key str
 			return nil, err
 		}
 		decrypted, err := app.DecryptStructuredAsMap(fileReader, format)
-		tmp, err := get(reflect.ValueOf(decrypted), strings.Split(key, "."), []string{})
+		tmp, err := traverser.GetKey(decrypted, strings.Split(key, "."))
 		if err != nil {
 			return nil, err
 		}
@@ -182,37 +181,4 @@ func getSecretReader(app *envelope.Envelope, file string, format string, key str
 	}
 
 	return secretReader, nil
-}
-
-func get(data reflect.Value, path []string, traversed []string) (interface{}, error) {
-	if len(path) == 0 {
-		if data.Elem().Kind() != reflect.String {
-			return nil, merry.Errorf("only strings can be encrypted safely. %s is of type %s", strings.Join(traversed, "."), data.Kind().String())
-		}
-		return data.Elem(), nil
-	}
-
-	nextKey := path[0]
-	nextPath := path[1:]
-	var zeroVal reflect.Value
-
-	switch data.Kind() {
-	case reflect.Interface:
-		fmt.Printf("traversing interface\n")
-		return get(data.Elem(), path, traversed)
-	case reflect.Map:
-		nextKeyVal := reflect.ValueOf(nextKey)
-		nextVal := data.MapIndex(nextKeyVal)
-
-		if nextVal == zeroVal {
-			traversedString := strings.Join(traversed, ".")
-			return nil, merry.Errorf("key is invalid beyond %s", traversedString).WithValue("traversed", traversedString)
-		}
-
-		traversed = append(traversed, nextKey)
-		return get(nextVal, nextPath, traversed)
-	default:
-		return nil, fmt.Errorf("Can't traverse %s at %s", data.Kind().String(), strings.Join(traversed, "."))
-	}
-	return nil, nil
 }
