@@ -56,6 +56,9 @@ func decryptCommand() cli.Command {
 			switch as {
 			case "blob":
 				decrypted, err = app.Decrypt(base64.NewDecoder(base64.StdEncoding, inputReader))
+				if err != nil {
+					return processErrors(err)
+				}
 			default:
 				handler, err := structuredErrorHandler(c.String("on-error"))
 				if err != nil {
@@ -63,10 +66,9 @@ func decryptCommand() cli.Command {
 				}
 				app.StructuredErrorBehaviour = handler
 				decrypted, err = app.DecryptStructured(inputReader, as)
-			}
-
-			if err != nil {
-				return processErrors(err)
+				if err != nil {
+					return processErrors(err)
+				}
 			}
 
 			outputWriter.Write(decrypted)
