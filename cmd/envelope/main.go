@@ -30,7 +30,13 @@ func main() {
 	}
 
 	app.Commands = []cli.Command{
-		addKeyCommand(),
+		cli.Command{
+			Name:  "profile",
+			Usage: "Profile related commands",
+			Subcommands: []cli.Command{
+				profileAddCommand(),
+			},
+		},
 		encryptCommand(),
 		decryptCommand(),
 	}

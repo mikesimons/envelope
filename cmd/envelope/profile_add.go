@@ -9,14 +9,20 @@ import (
 	"gopkg.in/urfave/cli.v1"
 )
 
-// addKeyCommand implements the add-key command
-// e.g $ envelope add-key test kms://arn
-func addKeyCommand() cli.Command {
+// profileAddCommand implements the `profile add` command
+// e.g $ envelope profile add test kms://arn
+func profileAddCommand() cli.Command {
 	return cli.Command{
-		Name:  "addkey",
-		Usage: "Add a key to the keyring.",
-		Description: `Master key DSN is of the form <provider>://<dsn>. The only supported provider is currently awskms.
-   Example: envelope add-key mytestkey awskms://arn:aws:kms:us-east-1:111111111111:key/abcdef01-2345-6789-abcd-ef0123456789`,
+		Name:  "add",
+		Usage: "Add a profile to the keyring.",
+		Description: `Master key DSN is of the form <provider>://<dsn>.
+   The only supported provider is currently awskms.
+
+   Example:
+
+     envelope profile add test \
+       awskms://arn:aws:kms:us-east-1:111111111111:key/abcdef01-2345-6789-abcd-ef0123456789 \
+       --context='role=somerole&test=test'`,
 		ArgsUsage: "<alias> <master key dsn>",
 		Flags: []cli.Flag{
 			cli.StringFlag{
@@ -25,15 +31,19 @@ func addKeyCommand() cli.Command {
 			},
 		},
 		Action: func(c *cli.Context) error {
-			if c.NArg() != 2 {
-				cli.ShowCommandHelp(c, "addkey")
-				fmt.Println("")
-				return cli.NewExitError("Error: Not enough arguments", 1)
-			}
-
 			keyring := c.GlobalString("keyring")
 			alias := c.Args().Get(0)
+			if alias == "" {
+				cli.ShowCommandHelp(c, "add")
+				return cli.NewExitError("Missing alias argument", 1)
+			}
+
 			providerDsn := c.Args().Get(1)
+			if providerDsn == "" {
+				cli.ShowCommandHelp(c, "add")
+				return cli.NewExitError("Missing master key dsn argument", 1)
+			}
+
 			context, err := parseEncryptionContext(c.String("context"))
 			if err != nil {
 				return processErrors(err)
