@@ -29,7 +29,14 @@ func codecForFormat(format string) (structuredCodec, error) {
 		}, nil
 	case "toml":
 		return structuredCodec{
-			Marshal:   toml.Marshal,
+			Marshal: func(v interface{}) ([]byte, error) {
+				// Internally we use with map[interface{}]interface{}
+				// YAML uses that natively and JSON figures it its actually a map[string]interface{} (or the implementation doesn't care)
+				// TOML *does* care so we have to do some type juggling
+				ptr := v.(*interface{})
+				val := (*ptr).(map[string]interface{})
+				return toml.Marshal(val)
+			},
 			Unmarshal: toml.Unmarshal,
 		}, nil
 	}
