@@ -2,6 +2,8 @@ package awskms
 
 import (
 	"fmt"
+
+	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/kms"
 	"github.com/aws/aws-sdk-go/service/kms/kmsiface"
 	. "github.com/onsi/ginkgo"
@@ -30,7 +32,7 @@ func (m *mockKMSClient) Decrypt(input *kms.DecryptInput) (*kms.DecryptOutput, er
 var _ = Describe("AWSKMS", func() {
 	Describe("New", func() {
 		It("should return AWS KMS key provider", func() {
-			dkp, err := New()
+			dkp, err := New(session.Must(session.NewSession()))
 			Expect(err).To(BeNil())
 			Expect(dkp).To(BeAssignableToTypeOf(&AWSKMSService{}))
 		})

@@ -9,9 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/kms"
 )
 
-var awsSession = session.Must(session.NewSession())
-
-func New() (*AWSKMSService, error) {
+func New(awsSession *session.Session) (*AWSKMSService, error) {
 	kmsClient := kms.New(awsSession, aws.NewConfig())
 	return &AWSKMSService{
 		client: kmsClient,

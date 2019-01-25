@@ -7,6 +7,10 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
+	"github.com/aws/aws-sdk-go/aws/session"
+
 	"github.com/ansel1/merry"
 	cli "gopkg.in/urfave/cli.v1"
 )
@@ -112,4 +116,28 @@ func (t *TrimReader) Read(p []byte) (n int, err error) {
 		return pos, err
 	}
 	return count, err
+}
+
+func awsSession(profile string, region string, role string) *session.Session {
+	options := session.Options{
+		Config:            aws.Config{},
+		SharedConfigState: session.SharedConfigEnable,
+	}
+
+	if region != "" {
+		options.Config.Region = aws.String(region)
+	}
+
+	if profile != "" {
+		options.Profile = profile
+	}
+
+	s := session.Must(session.NewSessionWithOptions(options))
+
+	if role != "" {
+		options.Config.Credentials = stscreds.NewCredentials(s, role, func(p *stscreds.AssumeRoleProvider) {})
+		s = session.Must(session.NewSession(&options.Config))
+	}
+
+	return s
 }

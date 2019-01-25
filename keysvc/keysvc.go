@@ -6,12 +6,14 @@ import (
 	"strings"
 
 	"github.com/ansel1/merry"
+	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/mikesimons/envelope/keysvc/awskms"
 	"gopkg.in/mgo.v2/bson"
 )
 
 func awsKeySvcFn() (KeyServiceProvider, error) {
-	return awskms.New()
+	awsSession := session.Must(session.NewSession())
+	return awskms.New(awsSession)
 }
 
 var services = map[string]func() (KeyServiceProvider, error){

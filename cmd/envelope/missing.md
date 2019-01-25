@@ -1,0 +1,9 @@
+- delete key ?
+- rotate key ?
+  - Mark key in keyring as replaced with ref of new key
+  - Refuse to decrypt key encrypted with rotated key unless operation is rotate
+  - Rotate command will:
+    - Decrypt values encrypted with rotated key
+    - Store decrypted values in map with (old) encrypted value as key
+    - Encrypt values in map
+    - Do string replace for each (search with key, replace with value)
