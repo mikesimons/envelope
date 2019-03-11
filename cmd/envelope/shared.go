@@ -100,6 +100,10 @@ func (t *TrimReader) Read(p []byte) (n int, err error) {
 	if count < len(p) && err == nil {
 		pos := count
 		for pos >= 0 {
+			if len(p[:pos]) == 0 {
+				break
+			}
+
 			eval := p[:pos][len(p[:pos])-1]
 			if eval == byte(0) || eval == byte('\n') || eval == byte('\r') {
 				pos = pos - 1
