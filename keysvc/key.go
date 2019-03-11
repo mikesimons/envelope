@@ -3,6 +3,10 @@ package keysvc
 import (
 	"encoding/base64"
 	"fmt"
+	"os"
+	"os/user"
+	"time"
+
 	//errors "github.com/hashicorp/errwrap"
 	"crypto/rand"
 
@@ -55,6 +59,21 @@ func (key *Key) EncryptBytes(data []byte) ([]byte, error) {
 	var plaintext [32]byte
 	copy(plaintext[:], key.Plaintext[:32])
 	ret.Ciphertext = secretbox.Seal(nonce[:], data, &nonce, &plaintext)
+	ret.At = time.Now().UTC().Unix()
+
+	username := "unknown"
+	u, err := user.Current()
+	if err == nil {
+		username = u.Username
+	}
+
+	host := "unknown"
+	h, err := os.Hostname()
+	if err == nil {
+		host = h
+	}
+
+	ret.By = fmt.Sprintf("%s@%s", username, host)
 	return bson.Marshal(ret)
 }
 

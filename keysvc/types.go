@@ -7,6 +7,8 @@ import (
 type encryptedData struct {
 	KeyID      uuid.UUID
 	Ciphertext []byte
+	At         int64
+	By         string
 }
 
 type KeyServiceProvider interface {
