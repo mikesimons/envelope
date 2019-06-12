@@ -7,8 +7,6 @@ import (
 	"reflect"
 	"strings"
 
-	"log"
-
 	"github.com/mikesimons/envelope"
 	"github.com/mikesimons/traverser"
 	"gopkg.in/urfave/cli.v1"
