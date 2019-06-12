@@ -107,7 +107,6 @@ func structuredErrorHandler(strategy string) (func(error) (traverser.Op, error),
 	case "exit":
 		return func(e error) (traverser.Op, error) {
 			// todo debug log e
-			log.Print(e)
 			return traverser.ErrorNoop(e)
 		}, nil
 	}
