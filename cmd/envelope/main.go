@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"log"
 
 	"github.com/mikesimons/envelope/keysvc"
 
@@ -68,5 +69,8 @@ func main() {
 		return nil
 	}
 
-	app.Run(os.Args)
+	err := app.Run(os.Args)
+	if err != nil {
+		log.Fatal(err)
+	}
 }

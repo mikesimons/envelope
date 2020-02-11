@@ -6,7 +6,7 @@ import (
 
 	"github.com/ansel1/merry"
 	"github.com/mikesimons/envelope/keysvc"
-	"github.com/satori/go.uuid"
+	uuid "github.com/satori/go.uuid"
 	"github.com/spf13/afero"
 	"gopkg.in/yaml.v2"
 )

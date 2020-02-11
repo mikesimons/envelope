@@ -8,8 +8,9 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/ansel1/merry"
 	"github.com/mikesimons/traverser"
+
+	"github.com/ansel1/merry"
 )
 
 // DecryptStructured will parse the input as format and use the encryption prefix to automatically identify and decrypt encrypted values
@@ -20,11 +21,13 @@ func (s *Envelope) DecryptStructured(input io.Reader, format string) ([]byte, er
 	}
 
 	inputData, err := s.DecryptStructuredAsMap(input, format)
+
 	if err != nil {
 		return nil, err
 	}
 
-	decrypted, err := codec.Marshal(&inputData)
+	decrypted, err := codec.Marshal(inputData)
+
 	if err != nil {
 		return []byte(""), merry.Wrap(err).WithUserMessage("error marshalling output")
 	}
@@ -38,13 +41,12 @@ func (s *Envelope) DecryptStructuredAsMap(input io.Reader, format string) (inter
 		return nil, merry.Wrap(err).WithUserMessage("unrecognized format").WithValue("format", format)
 	}
 
-	var inputData interface{}
 	inputBytes, err := ioutil.ReadAll(input)
 	if err != nil {
 		return nil, err
 	}
 
-	err = codec.Unmarshal(inputBytes, &inputData)
+	inputData, err := codec.Unmarshal(inputBytes)
 	if err != nil {
 		return nil, merry.Wrap(err).WithUserMessage("could not decode input").WithValue("format", format)
 	}
@@ -57,6 +59,7 @@ func (s *Envelope) DecryptStructuredAsMap(input io.Reader, format string) (inter
 				v := str[len(s.Prefix):]
 				bytesReader := bytes.NewReader([]byte(v))
 				inputReader := base64.NewDecoder(base64.StdEncoding, bytesReader)
+
 				decrypted, err := s.Decrypt(inputReader)
 
 				if err != nil {
@@ -69,11 +72,11 @@ func (s *Envelope) DecryptStructuredAsMap(input io.Reader, format string) (inter
 		},
 	}
 
-	err = t.Traverse(reflect.ValueOf(inputData))
+	output, err := t.Traverse(reflect.ValueOf(&inputData))
 
 	if err != nil {
 		return nil, err
 	}
 
-	return inputData, nil
+	return output.Interface(), nil
 }

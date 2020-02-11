@@ -1,10 +1,10 @@
-hash: 83455250e6234a9c27032c94d91b7d126bb878d91c37e7b82cde48e0df82e2c9
-updated: 2018-12-03T10:32:29.709193+01:00
+hash: a228937a24eb73a798debf7c733624f109d5025bd52bdd062e1c881bf82ee163
+updated: 2019-06-27T00:37:02.730836+02:00
 imports:
 - name: github.com/ansel1/merry
-  version: 5429a08c10ad44bc57a5dbbf49fd44a6371fb167
+  version: 4db5a8dcd6e777f88c88819528382e5b1490a1ba
 - name: github.com/aws/aws-sdk-go
-  version: ceab7b7ac6f535d1397f124620720b5145f1ad59
+  version: ef92c4e80137a128273036d32ba8bc6596085250
   subpackages:
   - aws
   - aws/awserr
@@ -15,6 +15,7 @@ imports:
   - aws/credentials
   - aws/credentials/ec2rolecreds
   - aws/credentials/endpointcreds
+  - aws/credentials/processcreds
   - aws/credentials/stscreds
   - aws/csm
   - aws/defaults
@@ -43,7 +44,7 @@ imports:
 - name: github.com/jmespath/go-jmespath
   version: c2b33e8439af944379acbdd9c3a5fe0bc44bd8a5
 - name: github.com/mikesimons/traverser
-  version: 127c46119b5c1a3d85fed89381bdd1b900502d02
+  version: 4d9ed96cc2e4f5e73b3bc4c09b472600c13d2dce
 - name: github.com/naoina/go-stringutil
   version: 6b638e95a32d0c1131db0e7fe83775cbea4a0d0b
 - name: github.com/naoina/toml
@@ -53,7 +54,7 @@ imports:
 - name: github.com/satori/go.uuid
   version: f58768cc1a7a7e77a3bd49e98cdd21419399b6a3
 - name: github.com/spf13/afero
-  version: d40851caa0d747393da1ffb28f7f9d8b4eeffebd
+  version: 588a75ec4f32903aa5e39a2619ba6a4631e28424
   subpackages:
   - mem
 - name: golang.org/x/crypto
@@ -91,6 +92,8 @@ imports:
   version: cfb38830724cc34fedffe9a2a29fb54fa9169cd1
 - name: gopkg.in/yaml.v2
   version: 51d6538a90f86fe93ac480b35f37b2be17fef232
+- name: gopkg.in/yaml.v3
+  version: 55513cacd4ae8b250e3a9084ab9d8c407b1ed618
 testImports:
 - name: github.com/hpcloud/tail
   version: a1dbeea552b7c8df4b542c66073e393de198a800
@@ -100,7 +103,7 @@ testImports:
   - watch
   - winfile
 - name: github.com/onsi/ginkgo
-  version: 2e1be8f7d90e9d3e3e58b0ce470f2f14d075406f
+  version: eea6ad008b96acdaa524f5b409513bf062b500ad
   subpackages:
   - config
   - internal/codelocation
@@ -120,7 +123,7 @@ testImports:
   - reporters/stenographer/support/go-isatty
   - types
 - name: github.com/onsi/gomega
-  version: 65fb64232476ad9046e57c26cd0bff3d3a8dc6cd
+  version: 90e289841c1ed79b7a598a7cd9959750cb5e89e2
   subpackages:
   - format
   - internal/assertion

@@ -11,7 +11,7 @@ import (
 	"crypto/rand"
 
 	"github.com/ansel1/merry"
-	"github.com/satori/go.uuid"
+	uuid "github.com/satori/go.uuid"
 	"golang.org/x/crypto/nacl/secretbox"
 	"gopkg.in/mgo.v2/bson"
 )

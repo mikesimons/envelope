@@ -13,6 +13,7 @@ func (s *Envelope) Decrypt(input io.Reader) ([]byte, error) {
 	}
 
 	decrypted, err := s.Keyring.Decrypt(inputBytes)
+
 	if err != nil {
 		return []byte(""), err
 	}

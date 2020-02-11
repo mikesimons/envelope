@@ -5,6 +5,8 @@ import (
 	"io/ioutil"
 	"strings"
 
+	"gopkg.in/yaml.v3"
+
 	"github.com/ansel1/merry"
 	"github.com/mikesimons/traverser"
 )
@@ -15,13 +17,13 @@ func (s *Envelope) InjectEncrypted(alias string, input io.Reader, key string, va
 		return []byte(""), merry.Wrap(err).WithUserMessage("unrecognized format").WithValue("format", format)
 	}
 
-	var inputData interface{}
 	inputBytes, err := ioutil.ReadAll(input)
 	if err != nil {
 		return []byte(""), err
 	}
 
-	err = codec.Unmarshal(inputBytes, &inputData)
+	//var inputData yaml.Node
+	inputData, err := codec.Unmarshal(inputBytes)
 	if err != nil {
 		return []byte(""), merry.Wrap(err).WithUserMessage("could not decode input").WithValue("format", format)
 	}
@@ -45,7 +47,8 @@ func (s *Envelope) InjectEncrypted(alias string, input io.Reader, key string, va
 		return []byte(""), merry.Wrap(err).WithValue("key", key)
 	}
 
-	ret, err := codec.Marshal(&inputData)
+	d := inputData.(yaml.Node)
+	ret, err := codec.Marshal(&d)
 	if err != nil {
 		return []byte(""), merry.Wrap(err).WithUserMessage("error marshalling output")
 	}

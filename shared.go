@@ -3,29 +3,56 @@ package envelope
 import (
 	"encoding/json"
 	"fmt"
+	"reflect"
 
 	"github.com/naoina/toml"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 type structuredCodec struct {
 	Marshal   func(interface{}) ([]byte, error)
-	Unmarshal func([]byte, interface{}) error
+	Unmarshal func([]byte) (interface{}, error)
+}
+
+func resolveInterface(t reflect.Value) reflect.Value {
+	if t.Kind() == reflect.Interface || t.Kind() == reflect.Ptr {
+		next := t.Elem()
+		if !next.IsValid() {
+			return reflect.ValueOf(nil)
+		}
+		return resolveInterface(next)
+	}
+	return t
 }
 
 func codecForFormat(format string) (structuredCodec, error) {
 	switch format {
 	case "yaml":
 		return structuredCodec{
-			Marshal:   yaml.Marshal,
-			Unmarshal: yaml.Unmarshal,
+			Marshal: func(v interface{}) ([]byte, error) {
+				resolved := resolveInterface(reflect.ValueOf(v))
+				if val, ok := (resolved.Interface().(yaml.Node)); ok {
+					return yaml.Marshal(&val)
+				}
+
+				return yaml.Marshal(v)
+			},
+			Unmarshal: func(b []byte) (interface{}, error) {
+				var out yaml.Node
+				err := yaml.Unmarshal(b, &out)
+				return out, err
+			},
 		}, nil
 	case "json":
 		return structuredCodec{
 			Marshal: func(v interface{}) ([]byte, error) {
 				return json.MarshalIndent(v, "", "  ")
 			},
-			Unmarshal: json.Unmarshal,
+			Unmarshal: func(b []byte) (interface{}, error) {
+				out := make(map[string]interface{})
+				err := json.Unmarshal(b, &out)
+				return out, err
+			},
 		}, nil
 	case "toml":
 		return structuredCodec{
@@ -37,7 +64,11 @@ func codecForFormat(format string) (structuredCodec, error) {
 				val := (*ptr).(map[string]interface{})
 				return toml.Marshal(val)
 			},
-			Unmarshal: toml.Unmarshal,
+			Unmarshal: func(b []byte) (interface{}, error) {
+				out := make(map[string]interface{})
+				err := toml.Unmarshal(b, &out)
+				return out, err
+			},
 		}, nil
 	}
 
